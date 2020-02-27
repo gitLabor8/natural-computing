@@ -106,7 +106,7 @@ while (iteration < n_iterations):
             search_space.gbest_value - search_space.target) <=
             search_space.target_error):
         break
-
+    print("Error = " + str(abs(search_space.gbest_value - search_space.target)))
     search_space.move_particles()
     iteration += 1
 
