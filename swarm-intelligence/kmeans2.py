@@ -1,14 +1,14 @@
 import numpy as np
-import pandas as pd
-import seaborn as sns
-sns.set_palette('husl')
 import matplotlib.pyplot as plt
-# %matplotlib inline
+import sklearn.datasets
+from sklearn.cluster import KMeans
 
-from sklearn import metrics
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-
-data = pd.read_csv('iris.data')
-data.head()
+iris = sklearn.datasets.load_iris(return_X_y=False)
+X = iris.data
+y = iris.target
+n_clusters = np.unique(y, return_counts=False).size
+estimator = sklearn.cluster.KMeans(n_clusters=n_clusters)
+estimator.fit(X)
+predicted_labels = estimator.labels_
+performance_score = sklearn.metrics.homogeneity_score(y, predicted_labels)
+print(performance_score)
