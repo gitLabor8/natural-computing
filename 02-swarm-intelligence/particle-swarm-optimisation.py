@@ -4,6 +4,15 @@
 
 import random
 import numpy as np
+import sklearn.datasets
+from scipy.spatial import distance
+iris = sklearn.datasets.load_iris(return_X_y=False)
+X = iris.data
+y = iris.target
+
+minima = np.min(X, axis=0)
+maxima = np.max(X, axis=0)
+
 
 W = 0.5
 c1 = 0.8
@@ -16,19 +25,25 @@ n_particles = int(input("Inform the number of particles: "))
 
 class Particle():
     def __init__(self):
-        self.position = np.array(
-            [(-1) ** (bool(random.getrandbits(1))) * random.random() * 50,
-             (-1) ** (bool(random.getrandbits(1))) * random.random() * 50])
-        self.pbest_position = self.position
+        self.solution = np.array([[random.uniform(minima[d], maxima[d]) for d in range(X.shape[1])] for i in range(np.unique(y, return_counts=False).size)])
+        self.pbest_solution = self.solution
         self.pbest_value = float('inf')
-        self.velocity = np.array([0, 0])
+        self.velocity = np.array([0, 0, 0, 0])
 
     def __str__(self):
-        print("I am at ", self.position, " meu pbest is ", self.pbest_position)
+        print("I am at ", self.solution, " meu pbest is ", self.pbest_solution)
 
     def move(self):
-        self.position = self.position + self.velocity
+        self.solution = self.solution + self.velocity
 
+    def fitness(self):
+        dist_label = np.zeros((len(X),len(self.solution)+1)) #+1 for label
+        for i in range(len(X)):
+            for j in range(len(self.solution)):
+                dist_label[i,j]=distance.euclidean(X[i], self.solution[j])
+            dist_label[i,3] = np.argmin(dist_label[i,:3]) #Set the best matching centroid as label
+
+        return np.mean([distance.euclidean(data,self.solution[int(dist_label[i,3])]) for data,i in zip(X,range(len(X)))])
 
 class Space():
 
@@ -38,36 +53,31 @@ class Space():
         self.n_particles = n_particles
         self.particles = []
         self.gbest_value = float('inf')
-        self.gbest_position = np.array([random.random() * 50, random.random() * 50])
+        self.gbest_solution = np.array([random.random(), random.random(), random.random(),random.random()])
 
     def print_particles(self):
         for particle in self.particles:
             particle.__str__()
 
-    def fitness(self, particle):
-        return particle.position[0] ** 2 + particle.position[1] ** 2 + 1
-
     def set_pbest(self):
         for particle in self.particles:
-            fitness_cadidate = self.fitness(particle)
+            fitness_cadidate = particle.fitness()
             if (particle.pbest_value > fitness_cadidate):
                 particle.pbest_value = fitness_cadidate
-                particle.pbest_position = particle.position
+                particle.pbest_solution = particle.solution
 
     def set_gbest(self):
         for particle in self.particles:
-            best_fitness_cadidate = self.fitness(particle)
+            best_fitness_cadidate = particle.fitness()
             if (self.gbest_value > best_fitness_cadidate):
                 self.gbest_value = best_fitness_cadidate
-                self.gbest_position = particle.position
+                self.gbest_solution = particle.solution
 
     def move_particles(self):
         for particle in self.particles:
             global W
-            new_velocity = (W * particle.velocity) + (c1 * random.random()) * (
-                        particle.pbest_position - particle.position) + \
-                           (random.random() * c2) * (
-                                       self.gbest_position - particle.position)
+            new_velocity = (W * particle.velocity) + (c1 * random.random()) * (particle.pbest_solution - particle.solution) + \
+            (random.random() * c2) * (self.gbest_solution - particle.solution)
             particle.velocity = new_velocity
             particle.move()
 
@@ -75,10 +85,20 @@ class Space():
 search_space = Space(1, target_error, n_particles)
 particles_vector = [Particle() for _ in range(search_space.n_particles)]
 search_space.particles = particles_vector
-search_space.print_particles()
+#search_space.print_particles()
+
+def quantization_error(solution):
+    dist_label = np.zeros((len(X),len(solution)+1))
+    for i in range(len(X)):
+        for j in range(len(solution)):
+            dist_label[i,j]=distance.euclidean(X[i], solution[j])
+        dist_label[i,3] = np.argmin(dist_label[i,:3])
+
+    return np.sum(np.square(np.array([distance.euclidean(data,[int(dist_label[i,3])]) for data,i in zip(X,range(len(X)))])))
 
 iteration = 0
 while (iteration < n_iterations):
+    print("Iteration "+str(iteration))
     search_space.set_pbest()
     search_space.set_gbest()
 
@@ -86,9 +106,11 @@ while (iteration < n_iterations):
             search_space.gbest_value - search_space.target) <=
             search_space.target_error):
         break
-
+    print("Error = " + str(abs(search_space.gbest_value - search_space.target)))
     search_space.move_particles()
     iteration += 1
 
-print("The best solution is: ", search_space.gbest_position, " in n_iterations: ",
+print("The best solution is: ", search_space.gbest_solution, " in n_iterations: ",
       iteration)
+
+print("Quantization error= "+ str(quantization_error(search_space.gbest_solution)))
