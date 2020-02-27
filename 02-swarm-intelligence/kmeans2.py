@@ -9,6 +9,8 @@ y = iris.target
 n_clusters = np.unique(y, return_counts=False).size
 estimator = sklearn.cluster.KMeans(n_clusters=n_clusters)
 estimator.fit(X)
-predicted_labels = estimator.labels_
-performance_score = sklearn.metrics.homogeneity_score(y, predicted_labels)
-print(performance_score)
+# predicted_labels = estimator.labels_
+# performance_score = sklearn.metrics.homogeneity_score(y, predicted_labels)
+# centroids = estimator.cluster_centers_
+inertia = estimator.inertia_
+print("Quantization error=" + str(inertia))
