@@ -9,6 +9,7 @@ startTime = datetime.now()
 import random
 import numpy as np
 import sklearn.datasets
+from sklearn.cluster import KMeans
 from scipy.spatial import distance
 iris = sklearn.datasets.load_iris(return_X_y=False)
 X = iris.data
@@ -17,9 +18,11 @@ y = iris.target
 minima = np.min(X, axis=0)
 maxima = np.max(X, axis=0)
 
-# W = 0.5
-# c1 = 0.8
-# c2 = 0.9
+n_clusters = np.unique(y, return_counts=False).size
+estimator = sklearn.cluster.KMeans(n_clusters=n_clusters)
+estimator.fit(X)
+inertia = estimator.inertia_
+print("Quantization error Iris Dataset = " + str(inertia))
 
 W = 0.85
 c1 = 1
@@ -28,11 +31,11 @@ c2 = 1.5
 quant_error_to_beat = 78.85
 # Max iterations, we'll stop when we beat the quant error of k-means
 # n_iterations = int(input("Inform the number of iterations: "))
-n_iterations = 100
+n_iterations = 200
 # target_error = float(input("Inform the target error: "))
 target_error = 1e-4
 # n_particles = int(input("Inform the number of particles: "))
-n_particles = 100
+n_particles = 150
 
 
 class Particle:
@@ -134,4 +137,4 @@ while (iteration < n_iterations):
 print("The best solution is: ", search_space.gbest_solution, " in n_iterations: ",
       iteration)
 
-print("Quantization error = " + str(quant_error))
+print("PSO Quantization error Iris Dataset = " + str(quant_error))
