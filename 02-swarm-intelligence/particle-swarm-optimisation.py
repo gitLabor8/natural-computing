@@ -2,6 +2,10 @@
 # https://medium.com/analytics-vidhya/implementing-particle-swarm-optimization-pso-algorithm-in-python-9efc2eb179a6
 # A lot of thanks to Iran Macedo for writing his tutorial!
 
+from datetime import datetime
+
+startTime = datetime.now()
+
 import random
 import numpy as np
 import sklearn.datasets
@@ -13,17 +17,21 @@ y = iris.target
 minima = np.min(X, axis=0)
 maxima = np.max(X, axis=0)
 
-
 W = 0.5
 c1 = 0.8
 c2 = 0.9
 
-n_iterations = int(input("Inform the number of iterations: "))
-target_error = float(input("Inform the target error: "))
-n_particles = int(input("Inform the number of particles: "))
+quant_error_to_beat = 0.7885
+# Max iterations, we'll stop when we beat the quant error of k-means
+# n_iterations = int(input("Inform the number of iterations: "))
+n_iterations = 50
+# target_error = float(input("Inform the target error: "))
+target_error = 1e-4
+# n_particles = int(input("Inform the number of particles: "))
+n_particles = 30
 
 
-class Particle():
+class Particle:
     def __init__(self):
         self.solution = np.array([[random.uniform(minima[d], maxima[d]) for d in range(X.shape[1])] for i in range(np.unique(y, return_counts=False).size)])
         self.pbest_solution = self.solution
@@ -45,7 +53,8 @@ class Particle():
 
         return np.mean([distance.euclidean(data,self.solution[int(dist_label[i,3])]) for data,i in zip(X,range(len(X)))])
 
-class Space():
+
+class Space:
 
     def __init__(self, target, target_error, n_particles):
         self.target = target
@@ -87,18 +96,22 @@ particles_vector = [Particle() for _ in range(search_space.n_particles)]
 search_space.particles = particles_vector
 #search_space.print_particles()
 
+
 def quantization_error(solution):
     dist_label = np.zeros((len(X),len(solution)+1))
     for i in range(len(X)):
         for j in range(len(solution)):
-            dist_label[i,j]=distance.euclidean(X[i], solution[j])
-        dist_label[i,3] = np.argmin(dist_label[i,:3])
+            dist_label[i, j] = distance.euclidean(X[i], solution[j])
+        dist_label[i, 3] = np.argmin(dist_label[i, :3])
 
     return np.sum(np.square(np.array([distance.euclidean(data,[int(dist_label[i,3])]) for data,i in zip(X,range(len(X)))])))
 
+
 iteration = 0
+quant_error = 1
 while (iteration < n_iterations):
-    print("Iteration "+str(iteration))
+# while (quant_error > quant_error_to_beat):
+    print("Iteration " + str(iteration))
     search_space.set_pbest()
     search_space.set_gbest()
 
@@ -107,10 +120,14 @@ while (iteration < n_iterations):
             search_space.target_error):
         break
     print("Error = " + str(abs(search_space.gbest_value - search_space.target)))
+    # quant_error = quantization_error(search_space.gbest_solution)
+    print(str(quant_error))
     search_space.move_particles()
+    print("Total computation time = " + str(datetime.now() - startTime))
     iteration += 1
 
 print("The best solution is: ", search_space.gbest_solution, " in n_iterations: ",
       iteration)
 
-print("Quantization error= "+ str(quantization_error(search_space.gbest_solution)))
+print("Quantization error = " + str(quant_error))
+

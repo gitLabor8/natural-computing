@@ -1,3 +1,6 @@
+from datetime import datetime
+startTime = datetime.now()
+
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn.datasets
@@ -14,3 +17,5 @@ estimator.fit(X)
 # centroids = estimator.cluster_centers_
 inertia = estimator.inertia_
 print("Quantization error = " + str(inertia))
+
+print("Total computation time = " + str(datetime.now() - startTime))
