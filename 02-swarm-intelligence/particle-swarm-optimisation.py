@@ -17,18 +17,22 @@ y = iris.target
 minima = np.min(X, axis=0)
 maxima = np.max(X, axis=0)
 
-W = 0.5
-c1 = 0.8
-c2 = 0.9
+# W = 0.5
+# c1 = 0.8
+# c2 = 0.9
 
-quant_error_to_beat = 0.7885
+W = 0.85
+c1 = 1
+c2 = 1.5
+
+quant_error_to_beat = 78.85
 # Max iterations, we'll stop when we beat the quant error of k-means
 # n_iterations = int(input("Inform the number of iterations: "))
-n_iterations = 50
+n_iterations = 100
 # target_error = float(input("Inform the target error: "))
 target_error = 1e-4
 # n_particles = int(input("Inform the number of particles: "))
-n_particles = 30
+n_particles = 100
 
 
 class Particle:
@@ -104,7 +108,7 @@ def quantization_error(solution):
             dist_label[i, j] = distance.euclidean(X[i], solution[j])
         dist_label[i, 3] = np.argmin(dist_label[i, :3])
 
-    return np.sum(np.square(np.array([distance.euclidean(data,[int(dist_label[i,3])]) for data,i in zip(X,range(len(X)))])))
+    return np.sum(np.square(np.array([distance.euclidean(data,solution[int(dist_label[i,3])]) for data,i in zip(X,range(len(X)))])))
 
 
 iteration = 0
@@ -120,14 +124,14 @@ while (iteration < n_iterations):
             search_space.target_error):
         break
     print("Error = " + str(abs(search_space.gbest_value - search_space.target)))
-    # quant_error = quantization_error(search_space.gbest_solution)
+    quant_error = quantization_error(search_space.gbest_solution)
     print(str(quant_error))
     search_space.move_particles()
     print("Total computation time = " + str(datetime.now() - startTime))
     iteration += 1
+    print("Quantization error = " + str(quant_error))
 
 print("The best solution is: ", search_space.gbest_solution, " in n_iterations: ",
       iteration)
 
 print("Quantization error = " + str(quant_error))
-
