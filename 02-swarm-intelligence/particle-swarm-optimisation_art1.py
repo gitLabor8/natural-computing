@@ -32,7 +32,7 @@ inertia = estimator.inertia_
 print("Kmeans quantization error Aritificial Dataset 1 = " + str(inertia))
 
 
-W = 0.85
+W = 0.7
 c1 = 1
 c2 = 1.5
 
