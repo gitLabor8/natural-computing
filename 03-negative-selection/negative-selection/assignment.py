@@ -4,6 +4,8 @@ from sklearn import metrics
 import subprocess
 import matplotlib.pyplot as plt
 
+# n = pattern length
+# r = matched substring length
 def run_negative_selection(n, r):
     output = subprocess.check_output("java -jar negsel2.jar -self english.train -n " + str(n) + " -r " + str(r) + " -c -l < english.test", shell=True)
     output = np.asarray(output.splitlines())
@@ -35,6 +37,7 @@ def calc_auc(english_test, tagalog_test, threshold):
     plt.ylabel("True Positive Rate")
     plt.show()
     return metrics.auc(fpr, tpr)
+
 
 
 def main():
