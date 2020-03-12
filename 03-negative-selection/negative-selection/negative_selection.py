@@ -36,7 +36,8 @@ def calc_auc(english_test, foreign_test, threshold):
 
 
 def main():
-    filepaths = ["lang/hiligaynon.txt", "lang/middle-english.txt", "lang/plautdietsch.txt", "lang/hiligaynon.txt"]
+    filepaths = ["lang/hiligaynon.txt", "lang/middle-english.txt",
+                 "lang/plautdietsch.txt", "lang/xhosa.txt"]
     for filepath in filepaths:
         english_test, foreign_test = run_negative_selection(10, 4, filepath)
         threshold = np.mean([*english_test, *foreign_test])
@@ -71,4 +72,5 @@ def find_r():
     # ('9', '0.5120967741935484')
 
 
-find_r()
+# find_r()
+main()
