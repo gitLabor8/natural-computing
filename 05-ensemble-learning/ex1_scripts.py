@@ -1,6 +1,7 @@
 import math
 
-w, h = 40, 40
+limit = 20
+w, h = 2*limit, 2*limit
 lookupTable = [[0.0 for x in range(w)] for y in range(h)]
 
 
@@ -20,7 +21,7 @@ def binomial_coeff(n, k):
     if k == 0 or k == n:
         return 1
     # Recursive Call
-    return binomial_coeff(n - 1, k - 1) + binomial_coeff(n - 1, k)
+    return binom_lookup_table(n - 1, k - 1) + binom_lookup_table(n - 1, k)
 
 
 def chance_of_success(p, n):
@@ -32,7 +33,7 @@ def chance_of_success(p, n):
     return aggregated_chance
 
 
-for i in range(0, 10):
-    print(chance_of_success(0.85, i*2+1))
+for i in range(0, limit):
+    print(chance_of_success(0.60, i*2+1))
 
 # print(chance_of_success(0.5, 2))
