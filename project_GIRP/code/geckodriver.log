@@ -112,3 +112,12 @@ JavaScript error: https://eus.rubiconproject.com/usync.html, line 12: SecurityEr
 ###!!! [Parent][MessageChannel] Error: (msgtype=0xD,name=PAPZ::Msg_Destroy) Channel error: cannot send/recv
 
 1589549378673	Marionette	INFO	Stopped listening on port 64169
+1589560815567	mozrunner::runner	INFO	Running command: "/Applications/Firefox.app/Contents/MacOS/firefox-bin" "-marionette" "-foreground" "-no-remote" "-profile" "/var/folders/xv/pkmm5ns14ln_mpwl8_szb42c0000gn/T/rust_mozprofileYDcRX7"
+1589560816495	addons.webextension.doh-rollout@mozilla.org	WARN	Loading extension 'doh-rollout@mozilla.org': Reading manifest: Invalid extension permission: networkStatus
+1589560816521	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: mozillaAddons
+1589560816521	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: telemetry
+1589560816521	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: resource://pdf.js/
+1589560816521	addons.webextension.screenshots@mozilla.org	WARN	Loading extension 'screenshots@mozilla.org': Reading manifest: Invalid extension permission: about:reader*
+1589560818975	Marionette	INFO	Listening on port 58349
+1589560819015	Marionette	WARN	TLS certificate errors will be ignored for this session
+1589560823569	Marionette	INFO	Stopped listening on port 58349
