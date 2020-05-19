@@ -10,10 +10,9 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
-
 # Indicates whether a key is currently pressed.
 KEYBOARD = {'a':False, 'b':False, 'c':False, 'd':False, 'e':False, 'f':False, 'g':False, 'h':False, 'i':False, 'j':False, 'k':False, 'l':False, 'm':False, 'n':False, 'o':False, 'p':False, 'q':False, 'r':False, 's':False, 't':False, 'u':False, 'v':False, 'w':False, 'x':False, 'y':False, 'z':False, 'shift':False}
-ACTIONS = {}
+ACTIONS = {} #Actions which result from decoding the genetic code.
 class Driver:
     def __init__(self):
         # TODO distinguish between Mac and Windows
@@ -32,7 +31,7 @@ class Driver:
     # Given a sequence plays the game and returns the achieved high score
     def play_game(self, codeSequence):
         # TODO Moooooore
-        return self._read_score()
+        return self.read_score()
         pass
 
     #FROM: https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
@@ -51,14 +50,13 @@ class Driver:
         print(right)
         print(bottom)
         img = img.crop((int(new_left), int(top), int(new_right), int(new_bottom)))
-        img.save('screenshot.png')
+        img.save('screenshot.png') #This is a test
+        #return img
 
     # Returns the current score displayed on the screen
     def read_score(self):
-        # image = self.browser.get_GIRP_element.screenshot_as_png
-        # im = Image.open(BytesIO(image))  # uses PIL library to open image in memory
-        # im.save('scr0.png')
         self.capture_element(self.get_GIRP_element(), self.browser)
+        #OpenCV template matching for recognizing the score in the bottom-left
 
     def start_chrome(self):
 
@@ -75,15 +73,6 @@ class Driver:
         options.add_argument('--disable-infobars')
         options.add_argument("--ppapi-flash-version=32.0.0.101")
         options.add_argument("--ppapi-flash-path=/usr/lib/pepperflashplugin-nonfree/libpepflashplayer.so")
-
-
-        # prefs = {
-        #     "profile.default_content_setting_values.plugins": 1,
-        #     "profile.content_settings.plugin_whitelist.adobe-flash-player": 1,
-        #     "profile.content_settings.exceptions.plugins.*,*.per_resource.adobe-flash-player": 1,
-        #     "PluginsAllowedForUrls": "http://www.foddy.net/"
-        # }
-
         options.add_experimental_option("prefs",prefs)
         self.browser = webdriver.Chrome(chrome_options=options)
         print("Chrome driver started.")
@@ -95,13 +84,10 @@ class Driver:
         self.browser = webdriver.Firefox(fp)
         print("Firefox driver started")
 
-
     def visit_GIRP(self):
         print("Visiting GIRP URL.")
         self.browser.get('http://www.foddy.net/GIRP.html')
-
         time.sleep(1)
-
 
     def get_GIRP_element(self):
         return self.browser.find_element_by_css_selector("div[class=post-body]")
@@ -132,14 +118,5 @@ class Driver:
 
     def controller(self, chromosome):
         ## TODO: Handles the execution of genetic code
-        # for symbol in chromosome:
-        # #TODO: BLA
-        print("Nothing here.")
-
-    def test_keyboard(self):
-        print("Keyboard test.")
-        self.delay(500)
-        self.key_press('shift')
-        self.key_press('a')
-        self.delay(2000)
-        self.key_release('a')
+        for symbol in chromosome:
+            print("Nothing here.")
