@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # Class that creates an instance of GIRP and plays games in it.
 
-import sys, string, os, time, keyboard
+import sys, string, os, time, keyboard, io
 from selenium import webdriver
+from PIL import Image
+
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -20,7 +22,7 @@ class Driver:
         # self.start_chrome()
         self.start_firefox()
         self.visit_GIRP()
-        self.start_game(self.get_GIRP_screen())
+        self.start_game(self.get_GIRP_element())
 
         print("Driver initialized.")
 
@@ -33,12 +35,30 @@ class Driver:
         return self._read_score()
         pass
 
+    #FROM: https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
+    def capture_element(self, element, driver):
+        location = element.location
+        size = element.size
+        img = driver.get_screenshot_as_png()
+        img = Image.open(io.BytesIO(img))
+        left = location['x']
+        top = location['y']
+        right = location['x'] + size['width'] #Actual size is 640*480
+        bottom = location['y'] + size['height']
+        new_left = left + ((size['width']-640)/2)
+        new_right = right - ((size['width']-640)/2)
+        new_bottom = location['y'] + 480
+        print(right)
+        print(bottom)
+        img = img.crop((int(new_left), int(top), int(new_right), int(new_bottom)))
+        img.save('screenshot.png')
+
     # Returns the current score displayed on the screen
     def read_score(self):
-        image = self.browser.get_GIRP_screen.screenshot_as_png
-        im = Image.open(BytesIO(image))  # uses PIL library to open image in memory
-        im.save('scr0.png')
-
+        # image = self.browser.get_GIRP_element.screenshot_as_png
+        # im = Image.open(BytesIO(image))  # uses PIL library to open image in memory
+        # im.save('scr0.png')
+        self.capture_element(self.get_GIRP_element(), self.browser)
 
     def start_chrome(self):
 
@@ -83,7 +103,7 @@ class Driver:
         time.sleep(1)
 
 
-    def get_GIRP_screen(self):
+    def get_GIRP_element(self):
         return self.browser.find_element_by_css_selector("div[class=post-body]")
 
     def start_game(self, element):
