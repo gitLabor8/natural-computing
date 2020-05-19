@@ -4,5 +4,4 @@
 from driver import Driver
 
 driver = Driver()
-# driver.test_selenium()
-driver.test_keyboard()
+driver.read_score()
