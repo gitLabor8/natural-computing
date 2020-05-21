@@ -1,2 +1,4 @@
 # experimental 'main.py' that can be used to test files manually
 lab.py
+selenium/*
+geckodriver.log
