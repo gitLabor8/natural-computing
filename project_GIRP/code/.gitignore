@@ -2,3 +2,6 @@
 lab.py
 selenium/*
 geckodriver.log
+
+# Ignore screenshots
+*.png
