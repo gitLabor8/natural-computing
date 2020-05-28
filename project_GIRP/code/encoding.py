@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Defines the encoding and mutation of the genes
 
-from random import randint, choice
+from random import randint, choice, shuffle
 
 # Explanation:
 # a capital letter implies a key press
@@ -25,6 +25,7 @@ class GeneState:
         self.key1 = ""
         self.key2 = ""
 
+    # Generates the next state based on the current
     def next_state(self):
         self.sequence = self.sequence + self.next_char()
         return self
@@ -76,11 +77,15 @@ class GeneState:
                 self.key2 == other_gene.key2:
             return self.sequence + other_gene.sequence
         else:
+            print(self.shift == other_gene.shift)
+            print(self.key1 == other_gene.key1)
+            print(self.key2 == other_gene.key2)
             return None
 
 
 class Gene:
     # instantiates a random gene based on the unique available characters
+    #  Needs at least 2 characters
     def __init__(self, available_characters, length):
         self.states = []
         state = GeneState(available_characters)
@@ -98,16 +103,30 @@ class Gene:
             temp = temp + str(state) + "\n"
         return temp
 
+    def str_last(self):
+        return str(self.states[-1])
+
     # Perform a single point crossover
+    # Try to the crossover at several points, until the state matches
     # COULD ALSO FAIL: PROBLEM
     def crossover(self, other_gene):
-        crossing_points_self = list(range(len(self)))
-        crossing_points_other = list(range(len(other_gene)))
-        other_gene_state_number = choice(crossing_points_other)
-        crossing_points_other.remove(other_gene_state_number)
-        self_state_number = choice(crossing_points_self)
-        crossing_points_self.remove(crossing_points_self)
-        crossing = self.crossover(other_gene[other_gene_state_number])
-        if crossing is not None:
-            return crossing
+        # Create randomly ordered lists with the possible cut-off points
+        crossing_point_numbers_self = list(range(len(self.states)))
+        shuffle(crossing_point_numbers_self)
+        crossing_point_numbers_other = list(range(len(other_gene.states)))
+        shuffle(crossing_point_numbers_other)
 
+        # Try combinations until a crossover succeeds
+        for point_number_self in crossing_point_numbers_self:
+            crossing_point_numbers_self.remove(point_number_self)
+            for point_number_other in crossing_point_numbers_other:
+                crossing_point_numbers_other.remove(point_number_other)
+                crossing = self.states[point_number_self]\
+                            .crossover_try(other_gene.states[point_number_other])
+                if crossing is not None:
+                    return crossing
+        print("PANIC: NO POSSIBLE CROSSOVER POINTS FOUND")
+        # I guess crossing them both with length 0 works
+        #  But that's nonsensical to test, so better prevent that
+        #  This is currently by construction excluded
+        return None
