@@ -26,15 +26,17 @@ class Driver:
         # Start executing GIRP.exe
         # os.system("./GIRP.exe")
         # self.start_chrome()
+        self.browser = None
 
-        self.start_firefox()
-        self.visit_GIRP()
-        self.start_game(self.get_GIRP_element())
+        # self.start_firefox()
+        # self.visit_GIRP()
+        # self.start_game(self.get_GIRP_element())
 
         print("Driver initialized.")
 
     def __del__(self):
-        self.browser.quit()
+        if self.browser:
+            self.browser.quit()
 
     # Given a sequence plays the game and returns the achieved high score
     def play_game(self, codeSequence):
@@ -78,10 +80,10 @@ class Driver:
         score_left = new_left + 10
 
         img = img.crop((int(score_left), int(score_top), int(score_right), int(score_bottom)))
-        filename = "score{}".format(i)
-        img.save(filename+".png") #This is a test
-        # img = np.asarray(img)
-        # return img
+        img = np.asarray(img)
+        # filename = "score{}".format(i)
+        # plt.imsave(filename+".png", img) #This is a test
+        return img
 
     # Returns the current score displayed on the screen
 
@@ -125,10 +127,10 @@ class Driver:
         ac.move_to_element(element).click().perform() # Click to activate the flash player
         print("Manually Click allow.")
         self.delay(7000)
-
-        for i in range(0,1000):
-            self.capture_score_img(self.get_GIRP_element(), self.browser, i)
-            self.delay(100)
+        # Screen-shot test
+        # for i in range(0,1000):
+        #     self.capture_score_img(self.get_GIRP_element(), self.browser, i)
+        #     self.delay(100)
 
     def key_press(self, a):
         ## TODO:
@@ -149,23 +151,23 @@ class Driver:
 
     def get_score(self):
         # shot = self.capture_score_img(self.get_GIRP_element(), self.browser)
-        shot = Image.open("score.png")
-        img = ~(np.array(shot)[:,:,0]) #removes rgb and inverts colors
-        print(img.shape)
-        # plt.imshow(img)
-        # plt.show()
-        img = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)[1] #threshold to remove color artifacts and leave it black and white
-        print(img)
-        plt.imshow(img)
-        plt.show()
-        score = pytesseract.image_to_string(image=img)
+        shot = Image.open("score2.png")
+        img = ~(np.array(shot)[:,:,0]) #Removes rgb and inverts colors
+        img = cv2.threshold(img, 20, 255, cv2.THRESH_BINARY)[1] #threshold to remove color artifacts and leave it black and white
+        img = Image.fromarray(img)
+        # img.save("temp.png")
+        # img.show()
+        score = pytesseract.image_to_string(img, config='-c tessedit_char_whitelist=0123456789m. --psm 6')
+        img.show()
+        # os.remove("temp.png")
+        print(score)
         digits_rgx = re.compile("-?[0-9]+.?[0-9]")
         result = digits_rgx.findall(score)
         if len(result) > 0:
             score = result[0]
         else:
             score = 0
-        print(float(score))
+        # print(float(score))
 
     def controller(self, chromosome):
         ## TODO: Handles the execution of genetic code
