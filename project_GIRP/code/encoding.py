@@ -1,132 +1,99 @@
 #!/usr/bin/env python3
-# Defines the encoding and mutation of the genes
+# Defines the encoding of a climb
 
-from random import randint, choice, shuffle
+from random import randint, choice
 
-# Explanation:
-# a capital letter implies a key press
-# a small letter implies a key release
-# '+' implies a shift press
-# '-' implies a shift release
-# '.' implies a pause
+# Button press encoding:
+# - a capital letter implies a key press
+# - a small letter implies a key release
+# - '+' implies a shift press, when to start flexing
+flex = "+"
+# - '-' implies a shift release, when to start unflexing
+unflex = "-"
+# - '.' implies a pause
+pause = "."
+# Example: "A....+B...a-..C+....b-." (equivalent to the compact example)
 
-# The interval chances that a pause, shift, first hand or second hand is
-# used respectively
-# TODO Tweak the percentages
-chances = [25, 50, 75]
-
-
-# One moment of gene creation
-class GeneState:
-    def __init__(self, available_characters):
-        self.sequence = ""
-        self.available_characters = available_characters
-        self.shift = False
-        self.key1 = ""
-        self.key2 = ""
-
-    # Generates the next state based on the current
-    def next_state(self):
-        self.sequence = self.sequence + self.next_char()
-        return self
-
-    # Current constraints:
-    #  - Max 2 capital letters active at the same time
-    #  - A button cannot be pressed when it already is pressed
-    #  - idem for releasing
-    # TODO - Enforce at least one '.' between changes to left, right and shift
-    def next_char(self):
-        random = randint(0, 100)
-        global chances
-        # Do a pause
-        if random < chances[0]:
-            return "."
-        # Change the shift key
-        elif random < chances[1]:
-            self.shift = not self.shift
-            return "+" if self.shift else "-"
-        # Change the first hand
-        elif random < chances[2]:
-            (self.key1, ret_val) = self.change_hand(self.key1)
-            return ret_val
-        # Change the second hand
-        else:
-            (self.key2, ret_val) = self.change_hand(self.key2)
-            return ret_val
-
-    # Change one hand in the encoding.
-    # Returns current status to be saved and the new character
-    def change_hand(self, key):
-        if key == "":
-            random_char = choice(self.available_characters)
-            # Prevent the other hand from grabbing the same letter
-            self.available_characters = self.available_characters.replace(random_char, "")
-            return random_char, random_char.upper()
-        else:
-            # Make the key pressable again
-            self.available_characters = self.available_characters + key
-            return "", key.lower()
-
-    def __str__(self):
-        return "seq: \"" + self.sequence + "\", pressed keys: " + ("shift" if
-               self.shift else "") + " '" + self.key1 + "', '" + self.key2 + "'"
-
-    # Concatenate other_gene to current gene. Return 'None' if fail
-    def crossover_try(self, other_gene):
-        if self.shift == other_gene.shift and self.key1 == other_gene.key1 and \
-                self.key2 == other_gene.key2:
-            return self.sequence + other_gene.sequence
-        else:
-            print(self.shift == other_gene.shift)
-            print(self.key1 == other_gene.key1)
-            print(self.key2 == other_gene.key2)
-            return None
+# Compact encoding:
+# - Has initialisation: first letter followed by first flexing time
+# - a letter means trying to grab it
+# - the following int is the flexing time
+# - the int after that is the unflexing time
+# Example: "a4; b3-2; c4-1" (equivalent to the button press example)
 
 
 class Gene:
-    # instantiates a random gene based on the unique available characters
-    #  Needs at least 2 characters
-    def __init__(self, available_characters, length):
-        self.states = []
-        state = GeneState(available_characters)
-        for char in range(length):
-            state = state.next_state()
-            self.states = self.states + [state]
+    # Represent one climb
+    # - available_characters: List that it can climb to
+    # - starting_char: Character that determines if this is a left-handed or
+    #                   right-handed run
+    # - amount_of_leaps: Positive number
+    def __init__(self, available_chars, starting_char, amount_of_leaps):
+
+        # Initialisation phase
+        self.starting_char = starting_char
+        self.starting_time = randint(1, 10)
+        # Prevent climbing to the letter that we're holding on to
+        self.available_chars = available_chars.replace(starting_char, "")
+
+        # Climbing phase
+        self.leaps = []
+        prev_key = starting_char
+        for leap in range(amount_of_leaps):
+            block = Leap(self.available_chars, prev_key)
+            # Prevent climbing to the letter that we're holding on to
+            self.available_chars = self.available_chars.replace(block.key, "")
+            self.leaps.append(block)
+            prev_key = block.key
+            # Escape if there are no characters left to pick
+            if self.available_chars == "":
+                break
+
+    # Translates to a "button press encoding"
+    def button_press_encoding(self):
+        global pause
+        return self.starting_char.upper() + str((pause * self.starting_time)) \
+            + "".join([block.button_press_encoding() for block in self.leaps])
+
+    # Translates to a "compact encoding"
+    def compact_encoding(self):
+        return self.starting_char + str(self.starting_time) + "; " \
+            + "; ".join([block.compact_encoding() for block in self.leaps])
+
+    # Quick debugging representation
+    def __str__(self):
+        return "compact encoding: " + self.compact_encoding() \
+            + "\navailable chars left: " + self.available_chars
+
+
+class Leap:
+    # Perform one leap to another letter
+    def __init__(self, available_chars, prev_key):
+        # The key that you where holding on to
+        self.prev_key = prev_key
+        # The new key that you're grabbing towards
+        self.key = choice(available_chars)
+        # TODO Tweak these random intervals
+        # The time that you're flexing your muscles
+        self.flex_time = randint(1, 10)
+        # The time that you're releasing your muscles
+        self.unflex_time = randint(1, 5)
 
     # Define the length of the gene as the amount of time skips
     def __len__(self):
-        return self.states[-1].sequence.count(".")
+        return self.flex_time + self.unflex_time
 
+    # Translates to a "button press encoding"
+    def button_press_encoding(self):
+        global pause, flex, unflex
+        return flex + self.key.upper() + (pause * self.flex_time) \
+            + unflex + self.prev_key.lower() + (pause * self.unflex_time)
+
+    # Translates to a "compact encoding"
+    def compact_encoding(self):
+        return self.key + str(self.flex_time) + "-" + str(self.unflex_time)
+
+    # Quick debugging representation
     def __str__(self):
-        temp = ""
-        for state in self.states:
-            temp = temp + str(state) + "\n"
-        return temp
+        return self.compact_encoding()
 
-    def str_last(self):
-        return str(self.states[-1])
-
-    # Perform a single point crossover
-    # Try to the crossover at several points, until the state matches
-    # COULD ALSO FAIL: PROBLEM
-    def crossover(self, other_gene):
-        # Create randomly ordered lists with the possible cut-off points
-        crossing_point_numbers_self = list(range(len(self.states)))
-        shuffle(crossing_point_numbers_self)
-        crossing_point_numbers_other = list(range(len(other_gene.states)))
-        shuffle(crossing_point_numbers_other)
-
-        # Try combinations until a crossover succeeds
-        for point_number_self in crossing_point_numbers_self:
-            crossing_point_numbers_self.remove(point_number_self)
-            for point_number_other in crossing_point_numbers_other:
-                crossing_point_numbers_other.remove(point_number_other)
-                crossing = self.states[point_number_self]\
-                            .crossover_try(other_gene.states[point_number_other])
-                if crossing is not None:
-                    return crossing
-        print("PANIC: NO POSSIBLE CROSSOVER POINTS FOUND")
-        # I guess crossing them both with length 0 works
-        #  But that's nonsensical to test, so better prevent that
-        #  This is currently by construction excluded
-        return None
