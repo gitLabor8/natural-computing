@@ -4,4 +4,4 @@
 from driver import Driver
 
 driver = Driver()
-# driver.get_score()
+driver.get_score()
