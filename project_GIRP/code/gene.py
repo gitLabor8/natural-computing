@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Defines the encoding of a climb
+# Defines the encoding of a climb in a Gene object
 
-from random import randint, choice
+from random import randint, choice, shuffle
 
 # Button press encoding:
 # - a capital letter implies a key press
@@ -28,6 +28,7 @@ class Gene:
     # - starting_char: Character that determines if this is a left-handed or
     #                   right-handed run
     # - amount_of_leaps: Positive number
+    # - In case you already have a sequence of leaps it uses that instead
     def __init__(self, available_chars, starting_char, amount_of_leaps):
 
         # Initialisation phase
@@ -64,6 +65,27 @@ class Gene:
     def __str__(self):
         return "compact encoding: " + self.compact_encoding() \
             + "\navailable chars left: " + self.available_chars
+
+
+    # Splits the current gene on a random point and tries to combine it with the
+    # other gene
+    # Results in a full new Gene
+    # Cannot fail since the starting point is the same
+    def crossover(self, other_gene):
+        # Randomly select a point on self to cross
+        cross_points_self = list(range(len(self.leaps)))
+        shuffle(cross_points_self)
+        for cross_point_self in cross_points_self:
+            # By construction there is at most one prev_key that matches
+            # Backwards gives faster matching
+            for cross_point_other in range(len(other_gene.leaps)-1, -1, -1):
+                if self.leaps[cross_point_self].prev_key \
+                == other_gene.leaps[cross_point_other].prev_key:
+                        self.leaps = self.leaps[:cross_point_self] \
+                            + other_gene.leaps[cross_point_other:]
+                        return
+            # If there is no match we try another breaking point
+        print("Warning! No crossovers found! No crossover done!")
 
 
 class Leap:
