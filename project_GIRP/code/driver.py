@@ -9,7 +9,6 @@ from io import StringIO
 import numpy as np
 import matplotlib
 import pylab as plt
-import pytesseract
 import cv2
 import re
 from selenium.webdriver.common.keys import Keys
@@ -27,11 +26,10 @@ class Driver:
         # os.system("./GIRP.exe")
         # self.start_chrome()
         self.browser = None
-
-        # self.start_firefox()
-        # self.visit_GIRP()
-        # self.start_game(self.get_GIRP_element())
-
+        #
+        self.start_firefox()
+        self.visit_GIRP()
+        self.start_game(self.get_GIRP_element())
         print("Driver initialized.")
 
     def __del__(self):
@@ -58,10 +56,10 @@ class Driver:
         new_right = right - ((size['width']-640)/2)
         new_bottom = location['y'] + 480
         img = img.crop((int(new_left), int(top), int(new_right), int(new_bottom)))
-        img.save('screenshot.png') #This is a test
+        # img.save('screenshot.png') #This is a test
         #return img
 
-    def capture_score_img(self, element, driver, i):
+    def capture_score_img(self, element, driver):
         location = element.location
         size = element.size
         img = driver.get_screenshot_as_png()
@@ -76,17 +74,12 @@ class Driver:
 
         score_bottom = new_bottom - 30
         score_top = score_bottom - 40
-        score_right = new_left + 200
+        score_right = new_left + 200 #45 for first digit
         score_left = new_left + 10
 
         img = img.crop((int(score_left), int(score_top), int(score_right), int(score_bottom)))
         img = np.asarray(img)
-        # filename = "score{}".format(i)
-        # plt.imsave(filename+".png", img) #This is a test
         return img
-
-    # Returns the current score displayed on the screen
-
 
     def start_chrome(self):
 
@@ -126,11 +119,13 @@ class Driver:
         ac = ActionChains(self.browser)
         ac.move_to_element(element).click().perform() # Click to activate the flash player
         print("Manually Click allow.")
-        self.delay(7000)
+        self.delay(5000)
+        print("Manually the game and start.")
+        self.delay(2000)
         # Screen-shot test
-        # for i in range(0,1000):
+        # for i in range(0,30):
         #     self.capture_score_img(self.get_GIRP_element(), self.browser, i)
-        #     self.delay(100)
+        #     self.delay(5000)
 
     def key_press(self, a):
         ## TODO:
@@ -149,25 +144,30 @@ class Driver:
     def delay(self, t):
         time.sleep(t/1000)
 
-    def get_score(self):
-        # shot = self.capture_score_img(self.get_GIRP_element(), self.browser)
-        shot = Image.open("score2.png")
-        img = ~(np.array(shot)[:,:,0]) #Removes rgb and inverts colors
-        img = cv2.threshold(img, 20, 255, cv2.THRESH_BINARY)[1] #threshold to remove color artifacts and leave it black and white
-        img = Image.fromarray(img)
-        # img.save("temp.png")
-        # img.show()
-        score = pytesseract.image_to_string(img, config='-c tessedit_char_whitelist=0123456789m. --psm 6')
-        img.show()
-        # os.remove("temp.png")
-        print(score)
-        digits_rgx = re.compile("-?[0-9]+.?[0-9]")
-        result = digits_rgx.findall(score)
-        if len(result) > 0:
-            score = result[0]
+    def mean_squeared_error(self, imageA, imageB):
+        err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+        err /= float(imageA.shape[0] * imageA.shape[1])
+        return err
+
+    def get_digit(self, img):
+        scores = np.asarray([self.mean_squeared_error(img, np.asarray(Image.open("{}.png".format(i)))[:,:,0]) for i in range(0, 10)])
+        result = np.argwhere(scores == 0.0)
+        if len(result):
+            return str(np.squeeze(result))
         else:
-            score = 0
-        # print(float(score))
+            return "."
+
+
+
+    def get_score(self):
+        score_img = self.capture_score_img(self.get_GIRP_element(), self.browser)
+        score_img = ~(np.array(score_img)[:,:,0]) #Removes rgb and inverts colors
+        score_img = cv2.threshold(score_img, 20, 255, cv2.THRESH_BINARY)[1] #threshold to remove color artifacts and leave it black and white
+        first_digit = self.get_digit(score_img[:,:28])
+        second_digit = self.get_digit(score_img[:,32:60])
+        third_digit = self.get_digit(score_img[:,64:92])
+        score = float(first_digit+second_digit+third_digit)
+        return score
 
     def controller(self, chromosome):
         ## TODO: Handles the execution of genetic code
