@@ -4,7 +4,7 @@
 # In[ ]:
 
 
-#Imitialized population size and mutation rate as 10 
+#Initialized population size and mutation rate as 10 
     def _init_(self):
         self.population = []
         self.population_size = 10
