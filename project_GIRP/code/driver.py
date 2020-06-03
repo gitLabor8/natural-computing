@@ -21,26 +21,28 @@ KEYBOARD = {'a':False, 'b':False, 'c':False, 'd':False, 'e':False, 'f':False, 'g
 ACTIONS = {} #Actions which result from decoding the genetic code.
 class Driver:
     def __init__(self):
-        # TODO distinguish between Mac and Windows
-        # Start executing GIRP.exe
-        # os.system("./GIRP.exe")
-        # self.start_chrome()
         self.browser = None
-        #
         self.start_firefox()
         self.visit_GIRP()
         self.start_game(self.get_GIRP_element())
+        self.busy = False
         print("Driver initialized.")
 
     def __del__(self):
         if self.browser:
             self.browser.quit()
 
-    # Given a sequence plays the game and returns the achieved high score
+    def delay(self, t):
+        time.sleep(t/1000)
+
+    # Given a sequence plays the game and returns the fitness
     def play_game(self, codeSequence):
-        # TODO Moooooore
-        self.delay(10000)
-        pass
+        # TODO
+        if not self.busy:
+            print("Start new candidate solution.")
+            fitness = self.controller(codeSequence)
+        else:
+            print("Controller busy.")
 
     #FROM: https://stackoverflow.com/questions/15018372/how-to-take-partial-screenshot-with-selenium-webdriver-in-python
     def capture_element(self, element, driver):
@@ -74,15 +76,14 @@ class Driver:
 
         score_bottom = new_bottom - 30
         score_top = score_bottom - 40
-        score_right = new_left + 200 #45 for first digit
+        score_right = new_left + 110 #Increase for fourth character
         score_left = new_left + 10
 
         img = img.crop((int(score_left), int(score_top), int(score_right), int(score_bottom)))
         img = np.asarray(img)
         return img
 
-    def start_chrome(self):
-
+    def start_chrome(self): # Not used.
         options = webdriver.ChromeOptions()
         prefs = {
             "profile.default_content_setting_values.plugins": 1,
@@ -122,27 +123,6 @@ class Driver:
         self.delay(5000)
         print("Manually the game and start.")
         self.delay(2000)
-        # Screen-shot test
-        # for i in range(0,30):
-        #     self.capture_score_img(self.get_GIRP_element(), self.browser, i)
-        #     self.delay(5000)
-
-    def key_press(self, a):
-        ## TODO:
-        if a in KEYBOARD:
-            keyboard.send(a, do_press=True, do_release=False)
-            KEYBOARD[a] = True
-        elif a in actions:
-            print("Nothing here.")
-
-    def key_release(self, a):
-        ## TODO:
-        if KEYBOARD[a]:
-            keyboard.send(a, do_press=False, do_release=True)
-            KEYBOARD[a] = False
-
-    def delay(self, t):
-        time.sleep(t/1000)
 
     def mean_squeared_error(self, imageA, imageB):
         err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
@@ -150,14 +130,17 @@ class Driver:
         return err
 
     def get_digit(self, img):
-        scores = np.asarray([self.mean_squeared_error(img, np.asarray(Image.open("{}.png".format(i)))[:,:,0]) for i in range(0, 10)])
+        digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "dot"]
+        scores = np.asarray([self.mean_squeared_error(img, np.asarray(Image.open("digits/"+digits[i]+".png"))[:,:,0]) for i in range(0,11)])
         result = np.argwhere(scores == 0.0)
         if len(result):
-            return str(np.squeeze(result))
+            output = np.squeeze(result)
+            if output < 10:
+                return str(output)
+            else:
+                return "."
         else:
-            return "."
-
-
+            return -1
 
     def get_score(self):
         score_img = self.capture_score_img(self.get_GIRP_element(), self.browser)
@@ -166,10 +149,40 @@ class Driver:
         first_digit = self.get_digit(score_img[:,:28])
         second_digit = self.get_digit(score_img[:,32:60])
         third_digit = self.get_digit(score_img[:,64:92])
-        score = float(first_digit+second_digit+third_digit)
-        return score
+        try:
+            return float(first_digit+second_digit+third_digit)
+        except:
+            return "err"
 
-    def controller(self, chromosome):
-        ## TODO: Handles the execution of genetic code
-        for symbol in chromosome:
-            print("Nothing here.")
+    def key_press(self, a):
+        ## TODO:
+        if a in KEYBOARD:
+            print("Press %s" % a)
+            keyboard.send(a, do_press=True, do_release=False)
+            KEYBOARD[a] = True
+
+    def key_release(self, a):
+        ## TODO:
+        if KEYBOARD[a]:
+            print("Release %s" % a)
+            keyboard.send(a, do_press=False, do_release=True)
+            KEYBOARD[a] = False
+
+    def controller(self, gene):
+        ## TODO: return fitness
+        self.busy = True
+        for action in gene:
+            if action == "+":
+                self.key_press('shift')
+            elif action == "-":
+                self.key_release('shift')
+            elif action == ".":
+                self.delay(200)
+            elif action.isupper():
+                self.key_press(action.lower())
+            elif action.islower():
+                self.key_release(action)
+            else:
+                print("Illegal action.")
+        self.busy = False
+        return 0

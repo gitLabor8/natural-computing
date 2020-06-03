@@ -4,18 +4,17 @@
 from driver import Driver
 
 driver = Driver()
-while True:
-    driver.get_score()
-    driver.delay(100)
 
-# from gene import Gene
-#
-# gene1 = Gene("abcdefgh", "a", 6)
-# gene2 = Gene("abcdefgh", "a", 6)
-# print("The parents:")
-# print(str(gene1))
-# print(str(gene2))
-#
+from gene import Gene
+
+gene1 = Gene("abcdefgh", "a", 6)
+gene2 = Gene("abcdefgh", "a", 6)
+print("The parents:")
+print(str(gene1))
+print(str(gene2))
+
+driver.play_game(gene1.button_press_encoding())
+
 # # Important! Make a copy of a parent
 # geneChild = gene1
 # geneChild.crossover(gene2)
