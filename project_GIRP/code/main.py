@@ -7,13 +7,8 @@ driver = Driver()
 
 from gene import Gene
 
-gene1 = Gene("abcdefgh", "a", 6)
-gene2 = Gene("abcdefgh", "a", 6)
-print("The parents:")
-print(str(gene1))
-print(str(gene2))
-
-driver.play_game(gene1.button_press_encoding())
+codeSequence = "M......F+.......-....m...D+....-....d.....f................................"
+driver.play_game(codeSequence)
 
 # # Important! Make a copy of a parent
 # geneChild = gene1
