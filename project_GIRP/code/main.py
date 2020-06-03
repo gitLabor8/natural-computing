@@ -7,9 +7,16 @@ driver = Driver()
 
 from gene import Gene
 
-codeSequence = "M......F+.......-....m...D+....-....d.....f................................"
-driver.play_game(codeSequence)
+codeSequence = "M......F+.......-....m...D+....-....d.....f................................" #test sequence that climbs to 1.7 M
+fitness = driver.play_game(codeSequence)
+print(fitness)
 
+# gene1 = Gene("abcdefgh", "a", 6)
+# gene2 = Gene("abcdefgh", "a", 6)
+# print("The parents:")
+# print(str(gene1))
+# print(str(gene2))
+#
 # # Important! Make a copy of a parent
 # geneChild = gene1
 # geneChild.crossover(gene2)

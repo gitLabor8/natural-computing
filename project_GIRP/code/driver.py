@@ -33,14 +33,17 @@ class Fitness:
     def get_run(self):
         return self.run
 
+    def get_max_height(self):
+        return max(self.run)
+
     def get_avg_speed(self): #Denotes the avg speed in m/s, taking into account only the maximum height reached
         total_time = len(self.run)*DELAY_LENGTH
-        max_height = max(self.run)
+        max_height = self.get_max_height()
 
         return max_height/(total_time/1000)
 
     def get_fitness(self):
-        return 0
+        return self.get_avg_speed()*self.get_max_height()
 
 class Driver:
     def __init__(self):
@@ -62,6 +65,7 @@ class Driver:
         if not self.busy:
             print("Start new run.")
             fitness = self.controller(codeSequence)
+            return fitness
         else:
             print("Controller busy.")
 
@@ -178,5 +182,4 @@ class Driver:
                 else:
                     print("Illegal action.")
         self.busy = False
-        print(fitness.get_run())
-        print(fitness.get_avg_speed())
+        return fitness.get_fitness()
