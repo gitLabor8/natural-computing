@@ -34,6 +34,9 @@ class Fitness:
     def get_run(self):
         return self.run
 
+    def is_valid_run(self):
+        return len(self.run)>0
+
     def get_max_height(self):
         return max(self.run)
 
@@ -48,23 +51,30 @@ class Fitness:
 
 class Driver:
     def __init__(self):
-        self.browser = self.start_firefox()
         self.alive = False      #Indicates whether the climber is 'alive' (has not fallen in the current run).
         self.busy = False       #Indicates whether the controller is busy doing one task.
         self.progress = False   #Indicates whether the climber has made any progress in the current run.
+        self.browser = self.start_firefox()
         self.visit_GIRP()
         self.start_game(self.get_GIRP_element())
         print("Driver initialized.")
 
-def delay(t):
-    time.sleep(t/1000)
+    def __del__(self):
+        if self.browser:
+            self.browser.quit()
+
+    def is_busy(self):
+        return self.busy
 
     # Given a sequence plays the game and returns the fitness
     def play_game(self, codeSequence):
         # TODO
         if not self.busy:
             print("Start new run.")
+            self.alive = True
             fitness = self.controller(codeSequence)
+            delay(2000)
+            self.busy = False
             return fitness
         else:
             print("Controller busy.")
@@ -96,8 +106,8 @@ def delay(t):
         fp = webdriver.FirefoxProfile()
         fp.set_preference("dom.ipc.plugins.enabled.libflashplayer.so","true")
         fp.set_preference("plugin.state.flash", 2)
-        return webdriver.Firefox(fp)
         print("Firefox driver started")
+        return webdriver.Firefox(fp)
 
     def visit_GIRP(self):
         print("Visiting GIRP URL.")
@@ -110,8 +120,7 @@ def delay(t):
         print("Manually Click allow.")
         delay(5000)
         print("Manually the game and start.")
-        delay(2000)
-        self.alive = True
+        delay(5000)
 
     def mean_squeared_error(self, imageA, imageB):
         err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
@@ -181,5 +190,10 @@ def delay(t):
                     self.key_release(action)
                 else:
                     print("Illegal action.")
-        self.busy = False
-        return fitness.get_fitness()
+            else:
+                print("Climber died.")
+                break
+        if fitness.is_valid_run():
+            return fitness.get_fitness()
+        else:
+            return -1
