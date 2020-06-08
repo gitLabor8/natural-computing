@@ -12,10 +12,12 @@ def write_json(data):
         json.dump(data, f, indent=4)
 
 def store_intermedia_results(gene, fitness):
+    run, fitness_score = fitness
     with open('storage/data.json', ) as f:
         data = json.load(f)
         l = {'gene': gene,
-            'fitness': fitness}
+            'data': run,
+            'fitness': fitness_score}
         data.append(l)
         write_json(data)
 
@@ -39,7 +41,7 @@ while not queue.empty():
     else:
         g = queue.get()
         fitness = driver.play_game(g)
-        store_intermedia_results(g, fitness)
+        store_intermedia_results(g,fitness)
 
 
 

@@ -1,27 +1,26 @@
 
 #!/usr/bin/env python3
 # Class that creates an instance of GIRP and plays games in it.
-
-import sys, string, os, time, keyboard, io
+import sys, time, keyboard, io
 from selenium import webdriver
 from PIL import Image
-from io import StringIO
 import numpy as np
-import matplotlib
-import pylab as plt
 import cv2
-import re
-import threading
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 
 # Indicates whether a key is currently pressed.
 KEYBOARD = {'a':False, 'b':False, 'c':False, 'd':False, 'e':False, 'f':False, 'g':False, 'h':False, 'i':False, 'j':False, 'k':False, 'l':False, 'm':False, 'n':False, 'o':False, 'p':False, 'q':False, 'r':False, 's':False, 't':False, 'u':False, 'v':False, 'w':False, 'x':False, 'y':False, 'z':False, 'shift':False}
-DELAY_LENGTH = 200 #200ms
+DELAY_LENGTH = 200 #200ms is the length of a delay in the encoding.
+
 def delay(t):
     time.sleep(t/1000)
+
+def mean_squeared_error(imageA, imageB):
+    err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+    return err
+
+# This class keeps track of the achieved height in the run and calculating the Fitness used by the genetic algorithm.
+# It does so by storing the height every DELAY_LENGTH ms and calculating the average climbing speed and the max reached heigth.
 
 class Fitness:
     def __init__(self):
@@ -47,13 +46,14 @@ class Fitness:
         return max_height/(total_time/1000)
 
     def get_fitness(self):
-        return self.get_avg_speed()*self.get_max_height()
+        return self.run, self.get_avg_speed()*self.get_max_height()
 
+# This class is used to control the browser instance of the GIRP game.
 class Driver:
     def __init__(self):
-        self.alive = False      #Indicates whether the climber is 'alive' (has not fallen in the current run).
-        self.busy = False       #Indicates whether the controller is busy doing one task.
-        self.progress = False   #Indicates whether the climber has made any progress in the current run.
+        self.alive = False                          #Indicates whether the climber is 'alive' (has not fallen in the current run).
+        self.busy = False                           #Indicates whether the controller is currently performing a runk.
+        self.progress = False                       #Indicates whether the climber has made any progress in the current run, used to indicate whether the climber has fallen.
         self.browser = self.start_firefox()
         self.visit_GIRP()
         self.start_game(self.get_GIRP_element())
@@ -65,8 +65,29 @@ class Driver:
 
     def is_busy(self):
         return self.busy
+#Start Firefox-Selenium instance
+    def start_firefox(self):
+        fp = webdriver.FirefoxProfile()
+        fp.set_preference("dom.ipc.plugins.enabled.libflashplayer.so","true")
+        fp.set_preference("plugin.state.flash", 2)
+        print("Firefox driver started")
+        return webdriver.Firefox(fp)
+#Navigate to http://foddy.net/GIRP.html
+    def visit_GIRP(self):
+        print("Visiting GIRP URL.")
+        self.browser.get('http://www.foddy.net/GIRP.html')
+        delay(1000)
 
-    # Given a sequence plays the game and returns the fitness
+#Initializes and focusses the game. NOTE: Manually clicking the game to start and focus is still needed.
+    def start_game(self, element):
+        ac = ActionChains(self.browser)
+        ac.move_to_element(element).click().perform() # Click to activate the flash player
+        print("Manually Click allow.")
+        delay(5000)
+        print("Manually the game and start.")
+        delay(5000)
+
+# Given a sequence plays the game and returns the fitness
     def play_game(self, codeSequence):
         # TODO
         if not self.busy:
@@ -79,9 +100,11 @@ class Driver:
         else:
             print("Controller busy.")
 
+# Localizes the game coordinates inside the browser
     def get_GIRP_element(self):
         return self.browser.find_element_by_css_selector("div[class=post-body]")
 
+# Returns the relevant pixels to parse the displayed height
     def capture_score_img(self, element):
         location = element.location
         size = element.size
@@ -102,34 +125,10 @@ class Driver:
         img = np.asarray(img)
         return img
 
-    def start_firefox(self):
-        fp = webdriver.FirefoxProfile()
-        fp.set_preference("dom.ipc.plugins.enabled.libflashplayer.so","true")
-        fp.set_preference("plugin.state.flash", 2)
-        print("Firefox driver started")
-        return webdriver.Firefox(fp)
-
-    def visit_GIRP(self):
-        print("Visiting GIRP URL.")
-        self.browser.get('http://www.foddy.net/GIRP.html')
-        delay(1000)
-
-    def start_game(self, element):
-        ac = ActionChains(self.browser)
-        ac.move_to_element(element).click().perform() # Click to activate the flash player
-        print("Manually Click allow.")
-        delay(5000)
-        print("Manually the game and start.")
-        delay(5000)
-
-    def mean_squeared_error(self, imageA, imageB):
-        err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
-        err /= float(imageA.shape[0] * imageA.shape[1])
-        return err
-
+# Converts single digit-pixels to actual integer
     def get_digit(self, img):
         digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "dot"]
-        scores = np.asarray([self.mean_squeared_error(img, np.asarray(Image.open("digits/"+digits[i]+".png"))[:,:,0]) for i in range(0,11)])
+        scores = np.asarray([mean_squeared_error(img, np.asarray(Image.open("digits/"+digits[i]+".png"))[:,:,0]) for i in range(0,11)])
         result = np.argwhere(scores == 0.0)
         if len(result):
             output = np.squeeze(result)
@@ -140,6 +139,7 @@ class Driver:
         else:
             return -1
 
+# Converts the height-pixels to actual float denoting the height on screen
     def get_score(self):
         score_img = self.capture_score_img(self.get_GIRP_element())
         score_img = ~(np.array(score_img)[:,:,0]) #Removes rgb and inverts colors
@@ -161,16 +161,19 @@ class Driver:
         if self.alive:
             return height
 
+# Generates a key_down event of key a
     def key_press(self, a):
         if a in KEYBOARD:
             keyboard.send(a, do_press=True, do_release=False)
             KEYBOARD[a] = True
 
+# Generates a key_up event of key a
     def key_release(self, a):
         if KEYBOARD[a]:
             keyboard.send(a, do_press=False, do_release=True)
             KEYBOARD[a] = False
 
+# Parses the gene to actual key-events
     def controller(self, gene):
         self.busy = True
         fitness = Fitness()
