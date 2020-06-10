@@ -82,9 +82,9 @@ class Driver:
     def start_game(self, element):
         ac = ActionChains(self.browser)
         ac.move_to_element(element).click().perform() # Click to activate the flash player
-        print("Manually Click allow.")
+        print("Manually click allow.")
         delay(5000)
-        print("Manually vlick the game to start.")
+        print("Manually click the game-window to start the game.")
         delay(5000)
 
 # Given a sequence plays the game and returns the fitness
@@ -150,7 +150,7 @@ class Driver:
         try:
             height = float(first_digit+second_digit+third_digit)
         except:
-            height =  -1.0 #error
+            height =  -0.1 #error
 
         if height > 0.0:
             self.progress = True

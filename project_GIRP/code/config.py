@@ -6,7 +6,10 @@
 # ###
 
 # Mating pool size
-mating_pool_size = 4
+mating_pool_size = 5
+
+# Population size
+population_size = 20
 
 # Chance that two genes do a crossover
 crossover_rate = 0.10
@@ -26,7 +29,7 @@ else:
     starting_characters = "lr"
 
 # What are the letters that a rock can have?
-alphabet = "mrdtfznupe"
+alphabet = "bmrlkdftn"
 
 # ###
 # Initialisation of values

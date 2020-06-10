@@ -67,8 +67,7 @@ class Gene:
 
     # Quick debugging representation
     def __str__(self):
-        return self.compact_encoding() \
-            + "\navailable chars left: " + self.available_chars
+        return self.compact_encoding()+ "chars left: " + self.available_chars
 
 
     # Splits the current gene on a random point and tries to combine it with the
@@ -94,7 +93,6 @@ class Gene:
 
     # Mutates the time intervals of the gene
     def mutate(self):
-        print(self.starting_time)
         self.starting_time = mutate_time(self.starting_time)
         self.leaps = [leap.mutate() for leap in self.leaps]
         return self
@@ -149,4 +147,3 @@ def mutate_time(time):
             return time + 1
     else:
         return time
-    
