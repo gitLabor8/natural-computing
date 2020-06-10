@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # Class that creates an instance of GIRP and plays games in it.
 import sys, time, keyboard, io
@@ -7,24 +6,26 @@ from PIL import Image
 import numpy as np
 import cv2
 from selenium.webdriver.common.action_chains import ActionChains
+import config as config
 
 # Indicates whether a key is currently pressed.
 KEYBOARD = {'a':True, 'b':False, 'c':False, 'd':False, 'e':False, 'f':False, 'g':False, 'h':False, 'i':False, 'j':False, 'k':False, 'l':False, 'm':False, 'n':False, 'o':False, 'p':False, 'q':False, 'r':False, 's':False, 't':False, 'u':False, 'v':False, 'w':False, 'x':False, 'y':False, 'z':False, 'shift':False}
-DELAY_LENGTH = 200 #200ms is the length of a delay in the encoding.
 
-def delay(t):
-    time.sleep(t/1000)
 
-def mean_squeared_error(imageA, imageB):
+def mean_squared_error(imageA, imageB):
     err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
     return err
 
-# This class keeps track of the achieved height in the run and calculating the Fitness used by the genetic algorithm.
-# It does so by storing the height every DELAY_LENGTH ms and calculating the average climbing speed and the max reached heigth.
+
+# This class keeps track of the achieved height in the run and calculating the
+#   Fitness used by the genetic algorithm.
+# It does so by storing the height every 'delay' ms and calculating the average
+#   climbing speed and the max reached height.
 
 class Fitness:
     def __init__(self):
-        self.run = list() #After each delay in the gene (".") controller the height is recorded in this list.
+        # After each delay in the gene (".") controller the height is recorded in this list
+        self.run = list()
 
     def push(self, height):
         if isinstance(height, float):
@@ -34,19 +35,21 @@ class Fitness:
         return self.run
 
     def is_valid_run(self):
-        return len(self.run)>0
+        return len(self.run) > 0
 
     def get_max_height(self):
         return max(self.run)
 
-    def get_avg_speed(self): #Denotes the avg speed in m/s, taking into account only the maximum height reached
-        total_time = len(self.run)*DELAY_LENGTH
+# Denotes the avg speed in m/s, taking into account only the maximum height reached
+    def get_avg_speed(self):
+        total_time = len(self.run) * config.delay
         max_height = self.get_max_height()
 
         return max_height/(total_time/1000)
 
     def get_fitness(self):
         return self.run, self.get_avg_speed()*self.get_max_height()
+
 
 # This class is used to control the browser instance of the GIRP game.
 class Driver:
@@ -76,16 +79,16 @@ class Driver:
     def visit_GIRP(self):
         print("Visiting GIRP URL.")
         self.browser.get('http://www.foddy.net/GIRP.html')
-        delay(1000)
+        time.sleep(1)
 
 #Initializes and focusses the game. NOTE: Manually clicking the game to start and focus is still needed.
     def start_game(self, element):
         ac = ActionChains(self.browser)
         ac.move_to_element(element).click().perform() # Click to activate the flash player
         print("Manually click allow.")
-        delay(5000)
+        time.sleep(5)
         print("Manually click the game-window to start the game.")
-        delay(5000)
+        time.sleep(5)
 
 # Given a sequence plays the game and returns the fitness
     def play_game(self, codeSequence):
@@ -93,7 +96,7 @@ class Driver:
             print("Start new run.")
             self.alive = True
             fitness = self.controller(codeSequence)
-            delay(2500)
+            time.sleep(2.5)
             self.busy = False
             return fitness
         else:
@@ -125,9 +128,10 @@ class Driver:
         return img
 
 # Converts single digit-pixels to actual integer
-    def get_digit(self, img):
+    @staticmethod
+    def get_digit(img):
         digits = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "dot"]
-        scores = np.asarray([mean_squeared_error(img, np.asarray(Image.open("digits/"+digits[i]+".png"))[:,:,0]) for i in range(0,11)])
+        scores = np.asarray([mean_squared_error(img, np.asarray(Image.open("digits/"+digits[i]+".png"))[:,:,0]) for i in range(0,11)])
         result = np.argwhere(scores == 0.0)
         if len(result):
             output = np.squeeze(result)
@@ -193,7 +197,7 @@ class Driver:
                 elif action == "-":
                     self.key_release('shift')
                 elif action == ".":
-                    delay(DELAY_LENGTH)
+                    time.sleep(config.delay)
                     fitness.push(self.get_score())
                 elif action.isupper():
                     self.key_press(action.lower())

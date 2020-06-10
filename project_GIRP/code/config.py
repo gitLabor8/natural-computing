@@ -21,6 +21,9 @@ mutation_rate = 0.80
 # Game specific tweaks
 # ###
 
+# Delay, the step size in which we can change our behaviour in milliseconds
+delay = 200
+
 # First character that we will hold on to, based on left or righthandedness
 left_handed = True
 if left_handed:
