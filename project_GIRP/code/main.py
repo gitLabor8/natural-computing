@@ -41,7 +41,7 @@ def SGA(nr_or_generations=3):
     id = uuid.uuid1()
     pool = Pool(generation=0, mating_pool=None)
     pool.generate_random_population(amount_of_leaps=8)
-    evaluate_population(pool, id)
+    evaluate_population(0, pool, id)
     print(str(pool))
     for i in range (1, nr_or_generations+1):
         mating_pool = pool.fitness_proportionate_selection()
