@@ -2,6 +2,7 @@
 # Defines the encoding of a climb in a Gene object
 
 from random import randint, choice, shuffle
+import random as random
 import config as config
 
 # ## Button press encoding:
@@ -38,7 +39,6 @@ class Gene:
                                      , config.flexing_time_upperbound)
         # Prevent climbing to the letter that we're holding on to
         self.available_chars = config.alphabet.replace(self.starting_char, "").lower()
-
         # Climbing phase
         self.leaps = []
         prev_key = self.starting_char
@@ -92,14 +92,13 @@ class Gene:
             # If there is no match we try another breaking point
         print("Warning! No crossovers found! No crossover done!")
 
-    def mutate(self, fitness):
-        pass
-
     # Mutates the time intervals of the gene
-    # TODO over the past 2 seconds
     def mutate(self):
-        
-        pass
+        print(self.starting_time)
+        self.starting_time = mutate_time(self.starting_time)
+        self.leaps = [leap.mutate() for leap in self.leaps]
+        return self
+
 
 class Leap:
     # Perform one leap to another letter
@@ -108,7 +107,6 @@ class Leap:
         self.prev_key = prev_key
         # The new key that you're grabbing towards
         self.key = choice(available_chars)
-        # TODO Tweak these random intervals
         # The time that you're flexing your muscles
         self.flex_time = randint(config.flexing_time_lowerbound
                                  , config.flexing_time_upperbound)
@@ -133,3 +131,22 @@ class Leap:
     # Quick debugging representation
     def __str__(self):
         return self.compact_encoding()
+
+    # Mutates the time intervals of one leap
+    def mutate(self):
+        self.flex_time = mutate_time(self.flex_time)
+        self.unflex_time = mutate_time(self.unflex_time)
+        return self
+
+
+# Mutates one time interval
+def mutate_time(time):
+    if random.uniform(0, 1) < config.mutation_rate:
+        # 50% chance to shorten, 50% to lengthen
+        if random.choice([True, False]) and (time >= 1):
+            return time - 1
+        else:
+            return time + 1
+    else:
+        return time
+    
