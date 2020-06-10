@@ -2,20 +2,22 @@
 # Defines the encoding of a climb in a Gene object
 
 from random import randint, choice, shuffle
+import random as random
+import config as config
 
-# Button press encoding:
+# ## Button press encoding:
 # - a capital letter implies a key press
 # - a small letter implies a key release
 # - '+' implies a shift press, when to start flexing
 flex = "+"
 # - '-' implies a shift release, when to start unflexing
 unflex = "-"
-# - '.' implies a pause
+# - '.' implies a pause (200 ms or so, check driver for that)
 pause = "."
 # Example: "A....+B...a-..C+....b-." (equivalent to the compact example)
 
-# Compact encoding:
-# - Has initialisation: first letter followed by first flexing time
+# ## Compact encoding:
+# - Has initialisation: first letter followed by first unflexing time
 # - a letter means trying to grab it
 # - the following int is the flexing time
 # - the int after that is the unflexing time
@@ -29,17 +31,17 @@ class Gene:
     #                   right-handed run
     # - amount_of_leaps: Positive number
     # - In case you already have a sequence of leaps it uses that instead
-    def __init__(self, available_chars, starting_char, amount_of_leaps):
+    def __init__(self, amount_of_leaps):
 
         # Initialisation phase
-        self.starting_char = starting_char
-        self.starting_time = randint(1, 10)
+        self.starting_char = choice(config.starting_characters).lower()
+        self.starting_time = randint(config.flexing_time_lowerbound
+                                     , config.flexing_time_upperbound)
         # Prevent climbing to the letter that we're holding on to
-        self.available_chars = available_chars.replace(starting_char, "")
-
+        self.available_chars = config.alphabet.replace(self.starting_char, "").lower()
         # Climbing phase
         self.leaps = []
-        prev_key = starting_char
+        prev_key = self.starting_char
         for leap in range(amount_of_leaps):
             block = Leap(self.available_chars, prev_key)
             # Prevent climbing to the letter that we're holding on to
@@ -51,12 +53,14 @@ class Gene:
                 break
 
     # Translates to a "button press encoding"
+    # Is easily readable by the driver
     def button_press_encoding(self):
         global pause
         return self.starting_char.upper() + str((pause * self.starting_time)) \
             + "".join([block.button_press_encoding() for block in self.leaps])
 
     # Translates to a "compact encoding"
+    # Is easily readable for the user
     def compact_encoding(self):
         return self.starting_char + str(self.starting_time) + "; " \
             + "; ".join([block.compact_encoding() for block in self.leaps])
@@ -71,6 +75,7 @@ class Gene:
     # other gene
     # Results in a full new Gene
     # Cannot fail since the starting point is the same
+    # TODO skip first X seconds when score is good
     def crossover(self, other_gene):
         # Randomly select a point on self to cross
         cross_points_self = list(range(len(self.leaps)))
@@ -87,6 +92,13 @@ class Gene:
             # If there is no match we try another breaking point
         print("Warning! No crossovers found! No crossover done!")
 
+    # Mutates the time intervals of the gene
+    def mutate(self):
+        print(self.starting_time)
+        self.starting_time = mutate_time(self.starting_time)
+        self.leaps = [leap.mutate() for leap in self.leaps]
+        return self
+
 
 class Leap:
     # Perform one leap to another letter
@@ -95,11 +107,12 @@ class Leap:
         self.prev_key = prev_key
         # The new key that you're grabbing towards
         self.key = choice(available_chars)
-        # TODO Tweak these random intervals
         # The time that you're flexing your muscles
-        self.flex_time = randint(1, 10)
+        self.flex_time = randint(config.flexing_time_lowerbound
+                                 , config.flexing_time_upperbound)
         # The time that you're releasing your muscles
-        self.unflex_time = randint(1, 5)
+        self.unflex_time = randint(config.unflexing_time_lowerbound
+                                   , config.unflexing_time_upperbound)
 
     # Define the length of the gene as the amount of time skips
     def __len__(self):
@@ -118,3 +131,22 @@ class Leap:
     # Quick debugging representation
     def __str__(self):
         return self.compact_encoding()
+
+    # Mutates the time intervals of one leap
+    def mutate(self):
+        self.flex_time = mutate_time(self.flex_time)
+        self.unflex_time = mutate_time(self.unflex_time)
+        return self
+
+
+# Mutates one time interval
+def mutate_time(time):
+    if random.uniform(0, 1) < config.mutation_rate:
+        # 50% chance to shorten, 50% to lengthen
+        if random.choice([True, False]) and (time >= 1):
+            return time - 1
+        else:
+            return time + 1
+    else:
+        return time
+    
