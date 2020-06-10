@@ -5,3 +5,6 @@ geckodriver.log
 
 #Ignore pycache
 *.pyc
+
+# ignore the generated data, unless it's renamed
+storage/data.json
