@@ -84,7 +84,7 @@ class Driver:
         ac.move_to_element(element).click().perform() # Click to activate the flash player
         print("Manually Click allow.")
         delay(5000)
-        print("Manually the game and start.")
+        print("Manually vlick the game to start.")
         delay(5000)
 
 # Given a sequence plays the game and returns the fitness
@@ -93,7 +93,7 @@ class Driver:
             print("Start new run.")
             self.alive = True
             fitness = self.controller(codeSequence)
-            delay(2000)
+            delay(2500)
             self.busy = False
             return fitness
         else:
@@ -178,7 +178,6 @@ class Driver:
             if KEYBOARD[key]:
                 pressed_keys.append(key)
         for key in pressed_keys:
-            print("Release")
             self.key_release(key)
 
 # Parses the gene to actual key-events

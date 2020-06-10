@@ -17,13 +17,11 @@ class Pool:
         self.population_size = population_size
         if mating_pool is not None:
             print("Generating new population from mating pool.")
-            for i in range(population_size):
-                parent1 = mating_pool[0]['gene']
-                parent2 = mating_pool[1]['gene']
-                offspring = parent1
-                offspring.crossover(parent2)
-                self.pool.append({'gene': offspring, 'fitness':-1})
-            print(str(self))
+            self.pool = self.recombine(mating_pool)
+
+
+    def getlength(self):
+        return len(self.pool)
 
     def generate_random_population(self, available_chars, amount_of_leaps):
         for i in range(self.population_size):
@@ -34,17 +32,20 @@ class Pool:
         s=""
         return s.join([str(gene['gene'])+", fitness="+str(gene['fitness'])+"\n" for gene in self.pool])
 
-#Selects two parents from the pool at random using fitness proportionate selection
-    def fitness_proportionate_selection(self):
+#Selects mating_pool_size parents from the pool at random using fitness proportionate selection
+    def fitness_proportionate_selection(self, mating_pool_size):
         total = sum([gene['fitness'] for gene in self.pool])
         prob = [gene['fitness']/total for gene in self.pool]
-        result = np.random.choice(self.pool, 2, prob)
-        while result[0]==result[1]:
-            result = np.random.choice(self.pool, 2, prob) #Makes sure not the same parents are selected
-        return result
+        return np.random.choice(self.pool, mating_pool_size, prob, replace=False)
 
-    def getlength(self):
-        return len(self.pool)
+    def recombine(self, mating_pool):
+        for i in range(population_size):
+            parent1 = mating_pool[i%len(mating_pool)]['gene']
+            parent2 = mating_pool[i+1%len(mating_pool)]['gene']
+            offspring = parent1
+            offspring.crossover(parent2)
+            self.pool.append({'gene': offspring, 'fitness':-1})
+        print(str(self))
 #
 # def selectOne(self, population):
 #     max = sum([c.fitness for c in population])

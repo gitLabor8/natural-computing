@@ -2,11 +2,10 @@
 # Top level executing file
 
 from driver import Driver, Fitness
-import threading, queue, json
-from concurrent.futures import ThreadPoolExecutor
-
 from gene import Gene
 from pool import Pool
+
+import json
 
 def write_json(data):
     with open('storage/data.json','w') as f:
@@ -21,7 +20,6 @@ def store_intermedia_results(gene, run, fitness):
         data.append(l)
         write_json(data)
 
-
 driver = Driver()
 
 def evaluate_population(pool):
@@ -32,17 +30,19 @@ def evaluate_population(pool):
         store_intermedia_results(str(pool.pool[i]['gene']), run, fitness)
     return
 
-def SGA(nr_or_generations=2, population_size=4, available_chars="bmrlkdftn"):
-    pool = Pool(generation=0, population_size=population_size)
+def SGA(nr_or_generations=2, population_size=2, available_chars="bmrlkdftn", mating_pool_size=2):
+    pool = Pool(generation=0, population_size=population_size, mating_pool=None)
     pool.generate_random_population(available_chars, amount_of_leaps=6)
     print(str(pool))
     for i in range (1, nr_or_generations+1):
         print("Evaluating generation %i." % pool.generation)
         evaluate_population(pool)
-        mating_pool = pool.fitness_proportionate_selection()
+
+        mating_pool = pool.fitness_proportionate_selection(mating_pool_size)
         pool = Pool(generation=i, population_size=population_size,mating_pool=mating_pool)
 
-SGA()
+
+SGA() # 0.7 and a mutation rate of 1.5%.
 
 #Gene usage:
 # gene1 = Gene("abcdefgh", "a", 6)
