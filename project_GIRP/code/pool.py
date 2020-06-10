@@ -11,7 +11,7 @@ import numpy as np
 STARTING_LETTERS = ['B', 'L', 'R', 'M'] #Boulders the climber can reach when the game starts
 
 class Pool:
-    def __init__(self, generation, population_size = 10, mating_pool=None):
+    def __init__(self, generation, population_size, mating_pool=None):
         self.pool = list()
         self.generation = generation
         self.population_size = population_size
@@ -20,8 +20,10 @@ class Pool:
             for i in range(population_size):
                 parent1 = mating_pool[0]['gene']
                 parent2 = mating_pool[1]['gene']
-                offspring = parent1.crossover(parent1, parent2)
+                offspring = parent1
+                offspring.crossover(parent2)
                 self.pool.append({'gene': offspring, 'fitness':-1})
+            print(str(self))
 
     def generate_random_population(self, available_chars, amount_of_leaps):
         for i in range(self.population_size):

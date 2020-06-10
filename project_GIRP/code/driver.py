@@ -9,7 +9,7 @@ import cv2
 from selenium.webdriver.common.action_chains import ActionChains
 
 # Indicates whether a key is currently pressed.
-KEYBOARD = {'a':False, 'b':False, 'c':False, 'd':False, 'e':False, 'f':False, 'g':False, 'h':False, 'i':False, 'j':False, 'k':False, 'l':False, 'm':False, 'n':False, 'o':False, 'p':False, 'q':False, 'r':False, 's':False, 't':False, 'u':False, 'v':False, 'w':False, 'x':False, 'y':False, 'z':False, 'shift':False}
+KEYBOARD = {'a':True, 'b':False, 'c':False, 'd':False, 'e':False, 'f':False, 'g':False, 'h':False, 'i':False, 'j':False, 'k':False, 'l':False, 'm':False, 'n':False, 'o':False, 'p':False, 'q':False, 'r':False, 's':False, 't':False, 'u':False, 'v':False, 'w':False, 'x':False, 'y':False, 'z':False, 'shift':False}
 DELAY_LENGTH = 200 #200ms is the length of a delay in the encoding.
 
 def delay(t):
@@ -89,7 +89,6 @@ class Driver:
 
 # Given a sequence plays the game and returns the fitness
     def play_game(self, codeSequence):
-        # TODO
         if not self.busy:
             print("Start new run.")
             self.alive = True
@@ -173,6 +172,15 @@ class Driver:
             keyboard.send(a, do_press=False, do_release=True)
             KEYBOARD[a] = False
 
+    def release_pressed_keys(self):
+        pressed_keys = []
+        for key in KEYBOARD:
+            if KEYBOARD[key]:
+                pressed_keys.append(key)
+        for key in pressed_keys:
+            print("Release")
+            self.key_release(key)
+
 # Parses the gene to actual key-events
     def controller(self, gene):
         self.busy = True
@@ -190,15 +198,14 @@ class Driver:
                     fitness.push(self.get_score())
                 elif action.isupper():
                     self.key_press(action.lower())
-                    print("press")
                     death_counter+=1
                 elif action.islower():
                     self.key_release(action)
                 else:
                     print("Illegal action.")
-                print(death_counter)
                 if death_counter >= 3 and not self.progress:
                     self.alive=False
+                    self.release_pressed_keys()
             else:
                 print("Climber died.")
                 break
