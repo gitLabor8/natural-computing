@@ -7,6 +7,7 @@ from pool import Pool
 import config as config
 import uuid
 import json
+import numpy as np
 
 def write_json(data):
     with open('storage/data.json','w') as f:
@@ -31,14 +32,14 @@ def evaluate_population(generation, pool, id):
     for i in range(pool.getlength()):
         driver_encoding = pool.pool[i]['gene'].button_press_encoding()
         try:
-            fitness = [obj['fitness'] for obj in history if obj['gene']==driver_encoding][0]
+            fitness = [obj['fitness'] for obj in history if obj['gene']==str(pool.pool[i]['gene'])][0]
             print("Duplicate run found, using previous recorded fitness.")
         except:
             run, fitness = driver.play_game(driver_encoding)
             store_intermedia_results(str(pool.pool[i]['gene']),generation, run, fitness, id)
         pool.pool[i]['fitness'] = fitness
 
-def SGA(nr_or_generations=3):
+def SGA(nr_or_generations=10):
     id = uuid.uuid1()
     pool = Pool(generation=0, mating_pool=None)
     pool.generate_random_population(amount_of_leaps=8)
