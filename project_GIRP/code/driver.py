@@ -176,6 +176,7 @@ class Driver:
 # Parses the gene to actual key-events
     def controller(self, gene):
         self.busy = True
+        death_counter = 0
         fitness = Fitness()
         for action in gene:
             if self.alive:
@@ -189,10 +190,15 @@ class Driver:
                     fitness.push(self.get_score())
                 elif action.isupper():
                     self.key_press(action.lower())
+                    print("press")
+                    death_counter+=1
                 elif action.islower():
                     self.key_release(action)
                 else:
                     print("Illegal action.")
+                print(death_counter)
+                if death_counter >= 3 and not self.progress:
+                    self.alive=False
             else:
                 print("Climber died.")
                 break

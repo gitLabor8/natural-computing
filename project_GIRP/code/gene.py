@@ -63,7 +63,7 @@ class Gene:
 
     # Quick debugging representation
     def __str__(self):
-        return "compact encoding: " + self.compact_encoding() \
+        return self.compact_encoding() \
             + "\navailable chars left: " + self.available_chars
 
 
@@ -118,4 +118,3 @@ class Leap:
     # Quick debugging representation
     def __str__(self):
         return self.compact_encoding()
-
