@@ -68,7 +68,7 @@ class Gene:
 
     # Quick debugging representation
     def __str__(self):
-        return self.compact_encoding()+ " , chars left: " + self.available_chars
+        return self.compact_encoding()
 
 
     # Splits the current gene on a random point and tries to combine it with the

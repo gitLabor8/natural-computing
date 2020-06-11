@@ -48,7 +48,7 @@ class Fitness:
         total_time = len(self.run) * config.delay
         max_height = self.get_max_height()
 
-        return max_height/(total_time/1000)
+        return max_height/(total_time)
 
     def get_fitness(self):
         return self.run, self.get_avg_speed()*self.get_max_height()
@@ -195,7 +195,6 @@ class Driver:
         death_counter = 0
         fitness = Fitness()
         for action in gene:
-            print("action: " + action)
             if self.alive:
                 if action == "+":
                     self.key_press('shift')

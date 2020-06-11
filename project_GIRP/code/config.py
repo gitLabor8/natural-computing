@@ -13,7 +13,7 @@ id_number = uuid.uuid1()
 # ###
 
 # Mating pool size, how many
-mating_pool_size = 5
+mating_pool_size = 20
 
 # Total population size, how many genes do you want?
 population_size = 20
@@ -22,10 +22,10 @@ population_size = 20
 nr_or_generations = 3
 
 # The size that we want our solutions to be
-amount_of_leaps = 8
+amount_of_leaps = 16
 
 # Chance that two genes do a crossover
-crossover_rate = 0.25#0.10
+crossover_rate = 0.10#0.10
 
 # Chance that one number in a gene mutates
 #  So a gene with 10 leaps has 1-(1-0.20)^(1+10*2)=99% chance to mutate somewhere
@@ -47,7 +47,8 @@ else:
 
 # What are the letters that a rock can have?
 # alphabet = "bmrlkdftn"
-alphabet = "mkrshdftnjwzpeqsxgicyv"
+alphabet = "mkrshdftnjwzupeq"
+
 
 # ###
 # Initialisation of values

@@ -9,10 +9,9 @@ import config
 import json
 from printer import store_intermediate_results
 
+#
 driver = Driver()
 
-
-#
 def evaluate_population(pool):
     # Load history to prevent duplicate runs from being saved
     with open('storage/data.json') as f:
@@ -30,16 +29,24 @@ def evaluate_population(pool):
                                        , run, fitness, config.id_number)
         pool.pool[i]['fitness'] = fitness
 
-
 def SGA():
     pool = Pool()
     evaluate_population(pool)
     print(str(pool))
     for i in range(1, config.nr_or_generations + 1):
-        pool.create_next_generation()
+        pool.create_new_pool()
         print("Evaluating generation %i." % pool.generation)
         evaluate_population(pool)
         print(str(pool))
 
-
 SGA()
+
+# pool = Pool()
+# print("starting random pool:")
+# print(pool)
+# print("1 gen:")
+# pool.create_new_pool()
+# print("2 gen:")
+# pool.create_new_pool()
+# print("3 gen:")
+# pool.create_new_pool()
