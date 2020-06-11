@@ -5,6 +5,7 @@
 from random import randint, choice, shuffle
 import random
 import config
+import json, os
 
 # ## Button press encoding:
 # - a capital letter implies a key press
@@ -52,6 +53,7 @@ class Gene:
             # Escape if there are no characters left to pick
             if self.available_chars == "":
                 break
+        self.fitness = -1
 
     # Translates to a "button press encoding"
     # Is easily readable by the driver
@@ -68,8 +70,24 @@ class Gene:
 
     # Quick debugging representation
     def __str__(self):
-        return self.compact_encoding()
+        return self.compact_encoding() + ", fitness=" + str(self.fitness)
 
+    # Write the result of one gene to a file
+    def write_out_result(self, gen_number, intermediate_scores):
+        with open(config.output_file) as file:
+            if os.path.getsize(config.output_file) > 0:
+                data = json.load(file)
+            else:
+                data = []
+            gene_entry = {'gene': str(self),
+                          'generation': gen_number,
+                          'intermediate_scores': intermediate_scores,
+                          'fitness': self.fitness,
+                          'id': config.id_number.int}
+            print("data:" + str(data))
+            data.append(gene_entry)
+            print("data:" + str(data))
+            config.write_json(data)
 
     # Splits the current gene on a random point and tries to combine it with the
     # other gene

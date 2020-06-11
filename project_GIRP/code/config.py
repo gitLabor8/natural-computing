@@ -3,20 +3,20 @@
 # All global variables are in here
 # ##
 
-import uuid
+import uuid, json
 
-# Give each run a unique id_number
+# Give each run of the algorithm a unique id_number
 id_number = uuid.uuid1()
 
 # ###
 # Genetic algorithm tweaks
 # ###
 
-# Mating pool size, how many
-mating_pool_size = 20
-
 # Total population size, how many genes do you want?
-population_size = 20
+population_size = 3
+
+# Mating pool size, how many
+mating_pool_size = population_size
 
 # Number of times that we will refresh the population
 nr_or_generations = 3
@@ -59,3 +59,13 @@ flexing_time_lowerbound = 1
 flexing_time_upperbound = 10
 unflexing_time_lowerbound = 1
 unflexing_time_upperbound = 5
+
+# ###
+# Writing out the values to a file
+# ###
+
+output_file = "storage/data.json"
+
+def write_json(data):
+    with open('storage/data.json','w') as f:
+        json.dump(data, f, indent=4)
