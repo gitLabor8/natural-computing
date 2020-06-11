@@ -1,67 +1,45 @@
 #!/usr/bin/env python3
-# Top level executing file
+# ##
+# Top level executing file, starts the algorithm
+# ##
 
 from driver import Driver, Fitness
-from gene import Gene
 from pool import Pool
-import config as config
-import uuid
+import config
 import json
-
-def write_json(data):
-    with open('storage/data.json','w') as f:
-        json.dump(data, f, indent=4)
-
-def store_intermedia_results(gene, generation, run, fitness, id):
-    with open('storage/data.json') as f:
-        data = json.load(f)
-        l = {'gene': gene,
-            'generation': generation,
-            'data': run,
-            'fitness': fitness,
-            'id': id.int}
-        data.append(l)
-        write_json(data)
+from printer import store_intermediate_results
 
 driver = Driver()
 
-def evaluate_population(generation, pool, id):
+
+#
+def evaluate_population(pool):
+    # Load history to prevent duplicate runs from being saved
     with open('storage/data.json') as f:
         history = json.load(f)
-    for i in range(pool.getlength()):
+    for i in range(pool.get_length()):
         driver_encoding = pool.pool[i]['gene'].button_press_encoding()
+        # Try to prevent duplicate runs
         try:
-            fitness = [obj['fitness'] for obj in history if obj['gene']==driver_encoding][0]
+            fitness = [obj['fitness']
+                       for obj in history if obj['gene'] == driver_encoding][0]
             print("Duplicate run found, using previous recorded fitness.")
         except:
             run, fitness = driver.play_game(driver_encoding)
-            store_intermedia_results(str(pool.pool[i]['gene']),generation, run, fitness, id)
+            store_intermediate_results(str(pool.pool[i]['gene']), pool.generation
+                                       , run, fitness, config.id_number)
         pool.pool[i]['fitness'] = fitness
 
-def SGA(nr_or_generations=3):
-    id = uuid.uuid1()
-    pool = Pool(generation=0, mating_pool=None)
-    pool.generate_random_population(amount_of_leaps=8)
-    evaluate_population(0, pool, id)
-    print(str(pool))
-    for i in range (1, nr_or_generations+1):
-        mating_pool = pool.fitness_proportionate_selection()
-        pool = Pool(generation=i,mating_pool=mating_pool)
-        print("Evaluating generation %i." % pool.generation)
-        evaluate_population(i, pool, id)
-        print(str(pool))
-SGA()
 
-#Gene usage:
-# gene1 = Gene("abcdefgh", "a", 6)
-# gene2 = Gene("abcdefgh", "a", 6)
-# print("The parents:")
-# print(str(gene1))
-# print(str(gene2))
-#
-# # Important! Make a copy of a parent
-# geneChild = gene1
-# geneChild.crossover(gene2)
-#
-# print("The kid:")
-# print(str(geneChild))
+def SGA():
+    pool = Pool()
+    evaluate_population(pool)
+    print(str(pool))
+    for i in range(1, config.nr_or_generations + 1):
+        pool.create_next_generation()
+        print("Evaluating generation %i." % pool.generation)
+        evaluate_population(pool)
+        print(str(pool))
+
+
+SGA()

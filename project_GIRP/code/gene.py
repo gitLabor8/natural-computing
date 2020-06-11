@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
-# Defines the encoding of a climb in a Gene object
+# ##
+#  Defines the encoding of a climb in a Gene object
+# ##
 
 from random import randint, choice, shuffle
-import random as random
-import config as config
+import random
+import config
 
 # ## Button press encoding:
 # - a capital letter implies a key press

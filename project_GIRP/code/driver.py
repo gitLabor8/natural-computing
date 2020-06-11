@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
+# ##
 # Class that creates an instance of GIRP and plays games in it.
+# ##
+
 import sys, time, keyboard, io
 from selenium import webdriver
 from PIL import Image
 import numpy as np
 import cv2
 from selenium.webdriver.common.action_chains import ActionChains
-import config as config
+import config
 
 # Indicates whether a key is currently pressed.
 KEYBOARD = {'a':True, 'b':False, 'c':False, 'd':False, 'e':False, 'f':False, 'g':False, 'h':False, 'i':False, 'j':False, 'k':False, 'l':False, 'm':False, 'n':False, 'o':False, 'p':False, 'q':False, 'r':False, 's':False, 't':False, 'u':False, 'v':False, 'w':False, 'x':False, 'y':False, 'z':False, 'shift':False}
@@ -91,11 +94,11 @@ class Driver:
         time.sleep(5)
 
 # Given a sequence plays the game and returns the fitness
-    def play_game(self, codeSequence):
+    def play_game(self, code_sequence):
         if not self.busy:
-            print("Start new run.")
+            print("Start new run with: " + code_sequence)
             self.alive = True
-            fitness = self.controller(codeSequence)
+            fitness = self.controller(code_sequence)
             time.sleep(2.5)
             self.busy = False
             return fitness
