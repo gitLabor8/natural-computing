@@ -25,7 +25,7 @@ nr_or_generations = 3
 amount_of_leaps = 8
 
 # Chance that two genes do a crossover
-crossover_rate = 0.10
+crossover_rate = 0.25#0.10
 
 # Chance that one number in a gene mutates
 #  So a gene with 10 leaps has 1-(1-0.20)^(1+10*2)=99% chance to mutate somewhere
@@ -46,7 +46,8 @@ else:
     starting_characters = "lr"
 
 # What are the letters that a rock can have?
-alphabet = "bmrlkdftn"
+# alphabet = "bmrlkdftn"
+alphabet = "mkrshdftnjwzpeqsxgicyv"
 
 # ###
 # Initialisation of values

@@ -5,7 +5,6 @@
 from gene import Gene
 import numpy as np
 import config as config
-
 #TODO
 # Features to implement:
 # - Tournament selection: Select the best 2 out of 3 parents to crossover
@@ -44,10 +43,12 @@ class Pool:
     def recombine(self, mating_pool):
         new_pool = list()
         for i in range(self.population_size):
-            parent1 = mating_pool[i % config.mating_pool_size]['gene']
-            parent2 = mating_pool[(i+1) % config.mating_pool_size]['gene']
+            parents_idx = np.random.choice(range(0,config.mating_pool_size),2)
+            parent1 = mating_pool[parents_idx[0]]['gene']
+            parent2 = mating_pool[parents_idx[1]]['gene']
             offspring = parent1
             offspring.crossover(parent2)
             offspring.mutate()
-            new_pool.append({'gene': offspring, 'fitness': -1})
+            print(offspring)
+            new_pool.append({'gene': offspring, 'fitness':-1})
         return new_pool
