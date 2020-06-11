@@ -40,7 +40,7 @@ class Gene:
         self.starting_time = randint(config.flexing_time_lowerbound
                                      , config.flexing_time_upperbound)
         # Prevent climbing to the letter that we're holding on to
-        self.available_chars = config.alphabet.replace(self.starting_char, "").lower()
+        self.available_chars = config.alphabet.lower()
         # Climbing phase
         self.leaps = []
         prev_key = self.starting_char
@@ -95,6 +95,8 @@ class Gene:
     # Cannot fail since the starting point is the same
     # TODO skip first X seconds when score is good
     def crossover(self, other_gene):
+        if not random.uniform(0, 1) < config.crossover_rate:
+            return
         # Randomly select a point on self to cross
         cross_points_self = list(range(len(self.leaps)))
         shuffle(cross_points_self)
@@ -106,14 +108,20 @@ class Gene:
                 == other_gene.leaps[cross_point_other].prev_key:
                         self.leaps = self.leaps[:cross_point_self] \
                             + other_gene.leaps[cross_point_other:]
+                        # Reset the fitness
+                        self.fitness = -1
                         return
             # If there is no match we try another breaking point
         print("Warning! No crossovers found! No crossover done!")
 
     # Mutates the time intervals of the gene
     def mutate(self):
+        old = self
         self.starting_time = mutate_time(self.starting_time)
         self.leaps = [leap.mutate() for leap in self.leaps]
+        # When the gene changed the score should be reset
+        if old is not self:
+            self.fitness = -1
         return self
 
 
@@ -149,16 +157,19 @@ class Leap:
     def __str__(self):
         return self.compact_encoding()
 
-    # Mutates the time intervals of one leap
     def mutate(self):
+        # Mutates the time intervals of one leap
         self.flex_time = mutate_time(self.flex_time)
         self.unflex_time = mutate_time(self.unflex_time)
+        # Mutate the letter that it's going to leap to
+        if random.uniform(0, 1) < config.mutation_rate_key:
+            self.key = choice(config.alphabet.replace(self.prev_key, ''))
         return self
 
 
 # Mutates one time interval
 def mutate_time(time):
-    if random.uniform(0, 1) < config.mutation_rate:
+    if random.uniform(0, 1) < config.mutation_rate_timing:
         # 50% chance to shorten, 50% to lengthen
         if random.choice([True, False]) and (time >= 1):
             return time - 1

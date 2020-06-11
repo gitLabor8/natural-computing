@@ -13,13 +13,13 @@ id_number = uuid.uuid1()
 # ###
 
 # Total population size, how many genes do you want?
-population_size = 3
+population_size = 2
 
 # Mating pool size, how many
 mating_pool_size = population_size
 
 # Number of times that we will refresh the population
-nr_or_generations = 3
+nr_or_generations = 6
 
 # The size that we want our solutions to be
 amount_of_leaps = 16
@@ -28,8 +28,11 @@ amount_of_leaps = 16
 crossover_rate = 0.10#0.10
 
 # Chance that one number in a gene mutates
-#  So a gene with 10 leaps has 1-(1-0.20)^(1+10*2)=99% chance to mutate somewhere
-mutation_rate = 0.20
+#  So a gene with 10 leaps has 1-(1-0.20)^(1+10*2)=99% chance to mutate time
+mutation_rate_timing = 0.20
+# We differentiate, as mutating a letter is quite a big deal
+#  So a gene with 10 leaps has 1-(1-0.05)^(1+10*2)=66% chance to mutate
+mutation_rate_key = 0.05
 
 # ###
 # Game specific tweaks
