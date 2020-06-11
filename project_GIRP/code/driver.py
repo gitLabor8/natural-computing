@@ -168,13 +168,15 @@ class Driver:
             return height
 
 # Generates a key_down event of key a
-    def key_press(self, a):
+    @staticmethod
+    def key_press(a):
         if a in KEYBOARD:
             keyboard.send(a, do_press=True, do_release=False)
             KEYBOARD[a] = True
 
 # Generates a key_up event of key a
-    def key_release(self, a):
+    @staticmethod
+    def key_release(a):
         if KEYBOARD[a]:
             keyboard.send(a, do_press=False, do_release=True)
             KEYBOARD[a] = False
@@ -193,6 +195,7 @@ class Driver:
         death_counter = 0
         fitness = Fitness()
         for action in gene:
+            print("action: " + action)
             if self.alive:
                 if action == "+":
                     self.key_press('shift')
@@ -204,13 +207,13 @@ class Driver:
                     fitness.push(self.get_score())
                 elif action.isupper():
                     self.key_press(action.lower())
-                    death_counter+=1
+                    death_counter += 1
                 elif action.islower():
                     self.key_release(action)
                 else:
                     print("Illegal action.")
                 if death_counter >= 3 and not self.progress:
-                    self.alive=False
+                    self.alive = False
                     self.release_pressed_keys()
             else:
                 print("Climber died.")

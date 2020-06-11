@@ -36,7 +36,7 @@ mutation_rate = 0.20
 # ###
 
 # Delay, the step size in which we can change our behaviour in milliseconds
-delay = 200
+delay = 0.2
 
 # First character that we will hold on to, based on left or righthandedness
 left_handed = True
