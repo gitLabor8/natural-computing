@@ -84,9 +84,7 @@ class Gene:
                           'intermediate_scores': intermediate_scores,
                           'fitness': self.fitness,
                           'id': config.id_number.int}
-            print("data:" + str(data))
             data.append(gene_entry)
-            print("data:" + str(data))
             config.write_json(data)
 
     # Splits the current gene on a random point and tries to combine it with the
@@ -106,8 +104,12 @@ class Gene:
             for cross_point_other in range(len(other_gene.leaps)-1, -1, -1):
                 if self.leaps[cross_point_self].prev_key \
                 == other_gene.leaps[cross_point_other].prev_key:
-                        self.leaps = self.leaps[:cross_point_self] \
+                        new_leaps = self.leaps[:cross_point_self] \
                             + other_gene.leaps[cross_point_other:]
+                        # Prevent the genes from becoming too short
+                        if len(new_leaps) < config.amount_of_leaps:
+                            return
+                        self.leaps = new_leaps
                         # Reset the fitness
                         self.fitness = -1
                         return

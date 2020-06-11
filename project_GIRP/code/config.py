@@ -13,16 +13,16 @@ id_number = uuid.uuid1()
 # ###
 
 # Total population size, how many genes do you want?
-population_size = 2
+population_size = 20
 
 # Mating pool size, how many
 mating_pool_size = population_size
 
 # Number of times that we will refresh the population
-nr_or_generations = 6
+nr_or_generations = 10
 
 # The size that we want our solutions to be
-amount_of_leaps = 16
+amount_of_leaps = 8
 
 # Chance that two genes do a crossover
 crossover_rate = 0.10#0.10
@@ -49,8 +49,8 @@ else:
     starting_characters = "lr"
 
 # What are the letters that a rock can have?
-# alphabet = "bmrlkdftn"
-alphabet = "mkrshdftnjwzupeq"
+alphabet = "bmrlkdftnupeg"
+# alphabet = "mkrshdftnjwzupeq"
 
 
 # ###
