@@ -44,25 +44,22 @@ class Population:
     # Creates a mating pool based on ranked selection
     def fitness_ranked_selection(self):
         ranked_genes = sorted(self.genes, key=lambda x: x.fitness, reverse=True)
-        print("Ranked:\n" + "\n".join([str(gene) for gene in ranked_genes]))
         # Give the genes a weight based on their rank
         #  The total length of chance_list = 40
         chance_list = [gene for gene in ranked_genes[slice(0, 3)] for i in range(5)] \
                     + [gene for gene in ranked_genes[slice(3, 12)] for i in range(2)] \
                     + [gene for gene in ranked_genes[slice(12, 21)] for i in range(1)]
-        print("Chances:\n" + "\n".join([str(gene) for gene in chance_list]))
         return random.choices(chance_list, k=config.mating_pool_size)
 
+    # Uses the mating pool genes to crossover into new genes
     def recombine(self, mating_pool):
         new_pool = list()
-        for i in range(len(self.genes)):
-            parents_idx = np.random.choice(range(0, config.mating_pool_size), 2)
-            parent1 = mating_pool[parents_idx[0]]
-            parent2 = mating_pool[parents_idx[1]]
-            offspring = parent1
-            offspring.crossover(parent2)
+        while len(new_pool) < config.population_size:
+            random.shuffle(mating_pool)
+            mom = mating_pool[0]
+            dad = mating_pool[1]
+            offspring = mom.crossover(dad)
             offspring.mutate()
-            print(offspring)
             new_pool.append(offspring)
         return new_pool
 
