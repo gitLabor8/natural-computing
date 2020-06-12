@@ -13,13 +13,13 @@ id_number = uuid.uuid1()
 # ###
 
 # Total population size, how many genes do you want?
-population_size = 20
+population_size = 4
 
 # Mating pool size, how many
 mating_pool_size = population_size
 
 # Number of times that we will refresh the population
-nr_or_generations = 10
+nr_or_generations = 3
 
 # The size that we want our solutions to be
 amount_of_leaps = 8
@@ -33,6 +33,11 @@ mutation_rate_timing = 0.20
 # We differentiate, as mutating a letter is quite a big deal
 #  So a gene with 10 leaps has 1-(1-0.05)^(1+10*2)=66% chance to mutate
 mutation_rate_key = 0.05
+
+# How to determine a mating pool
+# 0 = roulette based on relative fitness
+# 1 = roulette based on ranked fitness
+fitness_selection = 1
 
 # ###
 # Game specific tweaks
