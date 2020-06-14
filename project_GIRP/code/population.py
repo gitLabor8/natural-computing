@@ -77,7 +77,7 @@ class Population:
             # Try to prevent duplicate runs
             duplicate_runs = [gene.fitness
                               for gene in history if gene == driver_encoding]
-            if duplicate_runs is not []:
+            if duplicate_runs is []:
                 print("Duplicate run found, using previous recorded fitness.")
             else:
                 intermediate_scores, fitness = driver.play_game(driver_encoding)

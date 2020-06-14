@@ -13,13 +13,13 @@ id_number = uuid.uuid1()
 # ###
 
 # Total population size, how many genes do you want?
-population_size = 3
+population_size = 20
 
 # Mating pool size, how many
 mating_pool_size = population_size
 
 # Number of times that we will refresh the population
-nr_or_generations = 3
+nr_or_generations = 5
 
 # The size that we want our solutions to be
 amount_of_leaps = 8
