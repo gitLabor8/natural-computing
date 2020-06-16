@@ -13,7 +13,7 @@ id_number = uuid.uuid1()
 # ###
 
 # Total population size, how many genes do you want?
-population_size = 20
+population_size = 50
 
 # Mating pool size, how many
 mating_pool_size = population_size
@@ -49,7 +49,7 @@ else:
     starting_characters = "lr"
 
 # What are the letters that a rock can have?
-alphabet = "bmrlkdftnupeg"
+alphabet = "kdftnupeg"
 # alphabet = "mkrshdftnjwzupeq"
 
 

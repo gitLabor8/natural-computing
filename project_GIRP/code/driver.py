@@ -82,6 +82,7 @@ class Driver:
     def visit_GIRP(self):
         print("Visiting GIRP URL.")
         self.browser.get('http://www.foddy.net/GIRP.html')
+        self.browser.set_window_size(850,750)
         time.sleep(1)
 
 #Initializes and focusses the game. NOTE: Manually clicking the game to start and focus is still needed.
@@ -101,6 +102,7 @@ class Driver:
             fitness = self.controller(code_sequence)
             time.sleep(2.5)
             self.busy = False
+            print("fitness=%f"%fitness[1])
             return fitness
         else:
             print("Controller busy.")
