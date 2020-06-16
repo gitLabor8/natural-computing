@@ -39,11 +39,10 @@ class Population:
         return "\n".join([str(gene) for gene in self.genes])
 
 # Selects parents from the pool at random using fitness proportionate selection
-    @staticmethod
-    def fitness_proportionate_selection(genepool):
-        total = sum([gene.fitness for gene in genepool])
-        prob = [gene.fitness / total for gene in genepool]
-        return np.random.choice(genepool, size=config.mating_pool_size, replace=True, p=prob)
+    def fitness_proportionate_selection(self):
+        total = sum([gene.fitness for gene in self.genes])
+        prob = [gene.fitness / total for gene in self.genes]
+        return np.random.choice(self.genes, size=config.mating_pool_size, replace=True, p=prob)
 
     # Creates a mating pool based on ranked selection
     def fitness_ranked_selection(self):
