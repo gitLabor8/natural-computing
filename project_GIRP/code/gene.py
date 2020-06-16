@@ -93,8 +93,9 @@ class Gene:
     # Cannot fail since the starting point is the same
     # TODO skip first X seconds when score is good
     def crossover(self, other_gene):
+        # Only perform crossover ever crossover_rate% of the times
         if not random.uniform(0, 1) < config.crossover_rate:
-            return
+            return self
         # Randomly select a point on self to cross
         cross_points_self = list(range(len(self.leaps)))
         shuffle(cross_points_self)
@@ -102,19 +103,24 @@ class Gene:
             # By construction there is at most one prev_key that matches
             # Backwards gives faster matching
             for cross_point_other in range(len(other_gene.leaps)-1, -1, -1):
+                # Check if the current key that they ar holding on to is the same
                 if self.leaps[cross_point_self].prev_key \
                 == other_gene.leaps[cross_point_other].prev_key:
                         new_leaps = self.leaps[:cross_point_self] \
                             + other_gene.leaps[cross_point_other:]
                         # Prevent the genes from becoming too short
-                        if len(new_leaps) < config.amount_of_leaps:
-                            return
-                        self.leaps = new_leaps
-                        # Reset the fitness
-                        self.fitness = -1
-                        return
-            # If there is no match we try another breaking point
+                        if len(new_leaps) > config.amount_of_leaps:
+                            # This is how babies are made
+                            child = Gene(0)
+                            child.starting_char = self.starting_char
+                            child.starting_time = self.starting_time
+                            child.leaps = new_leaps
+                            child.fitness = -1
+                            return child
+        # If there is no match anywhere we return self
         print("Warning! No crossovers found! No crossover done!")
+        config.failed_crossover_attempts = config.failed_crossover_attempts + 1
+        return self
 
     # Mutates the time intervals of the gene
     def mutate(self):

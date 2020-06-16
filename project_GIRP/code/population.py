@@ -6,6 +6,7 @@ from gene import Gene
 import numpy as np
 import config as config
 import json, os
+import random
 
 # TODO Features to implement:
 # - Tournament selection: Select the best 2 out of 3 parents to crossover
@@ -26,11 +27,10 @@ class Population:
     def become_successor(self):
         print("Evolving into population %i." % self.current_gen_number)
         self.current_gen_number = self.current_gen_number + 1
-        mating_pool = self.fitness_proportionate_selection(self.genes)
-        print("Mating pool:")
-        for i in mating_pool:
-            print(str(i))
-        self.genes = []
+        if config.fitness_selection == 0:
+            mating_pool = self.fitness_proportionate_selection()
+        else:
+            mating_pool = self.fitness_ranked_selection()
         self.genes = self.recombine(mating_pool)
         print("Offspringpool:")
         print(str(self))
@@ -45,6 +45,17 @@ class Population:
         prob = [gene.fitness / total for gene in genepool]
         return np.random.choice(genepool, size=config.mating_pool_size, replace=True, p=prob)
 
+    # Creates a mating pool based on ranked selection
+    def fitness_ranked_selection(self):
+        ranked_genes = sorted(self.genes, key=lambda x: x.fitness, reverse=True)
+        # Give the genes a weight based on their rank
+        #  The total length of chance_list = 40
+        chance_list = [gene for gene in ranked_genes[slice(0, 3)] for i in range(5)] \
+                    + [gene for gene in ranked_genes[slice(3, 12)] for i in range(2)] \
+                    + [gene for gene in ranked_genes[slice(12, 21)] for i in range(1)]
+        return random.choices(chance_list, k=config.mating_pool_size)
+
+    # Uses the mating pool genes to crossover into new genes
     def recombine(self, mating_pool):
         new_pool = []
         for i in range(config.mating_pool_size):
