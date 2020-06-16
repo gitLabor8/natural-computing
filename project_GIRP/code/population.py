@@ -54,15 +54,14 @@ class Population:
                     + [gene for gene in ranked_genes[slice(12, 21)] for i in range(1)]
         return random.choices(chance_list, k=config.mating_pool_size)
 
-    # Uses the mating pool genes to crossover into new genes
+        # Uses the mating pool genes to crossover into new genes
     def recombine(self, mating_pool):
-        new_pool = []
-        for i in range(config.mating_pool_size):
-            parents_idx = np.random.choice(range(0, config.mating_pool_size), 2)
-            parent1 = mating_pool[parents_idx[0]]
-            parent2 = mating_pool[parents_idx[1]]
-            offspring = parent1
-            offspring.crossover(parent2)
+        new_pool = list()
+        while len(new_pool) < config.population_size:
+            random.shuffle(mating_pool)
+            mom = mating_pool[0]
+            dad = mating_pool[1]
+            offspring = mom.crossover(dad)
             offspring.mutate()
             new_pool.append(offspring)
         return new_pool
@@ -88,3 +87,5 @@ class Population:
                     intermediate_scores, fitness = driver.play_game(driver_encoding)
                     gene.fitness = fitness
                     gene.write_out_result(self.current_gen_number, intermediate_scores)
+            else:
+                gene.write_out_result(self.current_gen_number, [])

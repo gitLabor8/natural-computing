@@ -149,7 +149,13 @@ class Driver:
 
 # Converts the height-pixels to actual float denoting the height on screen
     def get_score(self):
-        score_img = self.capture_score_img(self.get_GIRP_element())
+
+        while True:
+            try:
+                score_img = self.capture_score_img(self.get_GIRP_element())
+                break
+            except:
+                print("Reloading..")
         score_img = ~(np.array(score_img)[:,:,0]) #Removes rgb and inverts colors
         score_img = cv2.threshold(score_img, 20, 255, cv2.THRESH_BINARY)[1] #threshold to remove color artifacts and leave it black and white
         first_digit = self.get_digit(score_img[:,:28])
