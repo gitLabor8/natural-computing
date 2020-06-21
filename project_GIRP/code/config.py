@@ -13,7 +13,7 @@ id_number = uuid.uuid1()
 # ###
 
 # Total population size, how many genes do you want?
-population_size = 20
+population_size = 50
 
 # Mating pool size, how many
 mating_pool_size = population_size
@@ -25,7 +25,7 @@ nr_or_generations = 10
 amount_of_leaps = 10
 
 # Chance that two genes do a crossover
-crossover_rate = 0.25
+crossover_rate = 0.3
 
 # Chance that one number in a gene mutates
 #  So a gene with 10 leaps has 1-(1-0.20)^(1+10*2)=99% chance to mutate time
@@ -44,10 +44,10 @@ fitness_selection = 0
 # ###
 
 # Delay, the step size in which we can change our behaviour in milliseconds
-delay = 0.2
+delay = 0.1
 
 # First character that we will hold on to, based on left or righthandedness
-left_handed = True
+left_handed = False
 if left_handed:
     starting_characters = "bm"
 else:
@@ -63,10 +63,10 @@ alphabet = "kdfthnuwszxq"
 # ###
 
 # How long is the maximum time to flex/unflex in Time Intervals
-flexing_time_lowerbound = 1
-flexing_time_upperbound = 5
-unflexing_time_lowerbound = 1
-unflexing_time_upperbound = 5
+flexing_time_lowerbound = 2
+flexing_time_upperbound = 8
+unflexing_time_lowerbound = 2
+unflexing_time_upperbound = 8
 
 # Keeps track of all the failed crossover attempts. Can be used for debugging
 failed_crossover_attempts = 0

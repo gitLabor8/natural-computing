@@ -35,7 +35,7 @@ def visualize_fitness(id):
 
 
 def SGA():
-    population = Population()
+    population = Population(freeze_keys="rtpsxqbdytuojqblziwoyelrzdujvofawstnzlfagthirbefdmgkcvunlsxrpq")
     population.evaluate(driver)
     print("Evaluation:")
     print(str(population))
@@ -49,4 +49,10 @@ def SGA():
 if __name__ == '__main__':
     # driver = Driver()
     # SGA()
-    visualize_fitness(id=51042402122418470103137833325575218912)
+    visualize_fitness(id=262903231952965922395671445180092458720)
+
+    #51042402122418470103137833325575218912 = run met settings van github
+
+    #GIRP beaen in 3m22: https://www.youtube.com/watch?v=q1STTnctFms
+    #Route: RTPSXQBDYTUOJQBLZIWOYELRZDUJVOFAWSTNZLFAGTHIRBEFDMGKCVUNLSXRPQ
+    #Fixed keys, only time mutations and crossover: 290375702044397373575868582310983706336

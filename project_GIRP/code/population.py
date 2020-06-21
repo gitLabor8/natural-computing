@@ -15,13 +15,13 @@ import random
 
 
 class Population:
-    def __init__(self):
+    def __init__(self, freeze_keys=None, freeze_timing=None):
         # The sample population
         self.genes = []
         self.current_gen_number = 0
         # Instantiating the sample population
         for i in range(config.population_size):
-            self.genes.append(Gene(config.amount_of_leaps))
+            self.genes.append(Gene(config.amount_of_leaps, freeze_keys, freeze_timing))
 
 
     def become_successor(self):

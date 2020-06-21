@@ -33,7 +33,7 @@ class Gene:
     #                   right-handed run
     # - amount_of_leaps: Positive number
     # - In case you already have a sequence of leaps it uses that instead
-    def __init__(self, amount_of_leaps):
+    def __init__(self, amount_of_leaps, freeze_keys=None, freeze_timing=None):
 
         # Initialisation phase
         self.starting_char = choice(config.starting_characters).lower()
@@ -44,15 +44,27 @@ class Gene:
         # Climbing phase
         self.leaps = []
         prev_key = self.starting_char
-        for leap in range(amount_of_leaps):
-            block = Leap(self.available_chars, prev_key)
-            # Prevent climbing to the letter that we're holding on to
-            self.available_chars = self.available_chars.replace(block.key, "")
-            self.leaps.append(block)
-            prev_key = block.key
-            # Escape if there are no characters left to pick
-            if self.available_chars == "":
-                break
+
+        if freeze_keys is not None:
+            prev_key = freeze_keys[0]
+            for i in range(amount_of_leaps):
+                key = freeze_keys[1:][i]
+                block = Leap(key, prev_key, freeze_keys=True)
+                prev_key = key
+                self.leaps.append(block)
+        elif freeze_timing is not None:
+            #TODO
+            pass
+        else:
+            for leap in range(amount_of_leaps):
+                block = Leap(self.available_chars, prev_key)
+                # Prevent climbing to the letter that we're holding on to
+                self.available_chars = self.available_chars.replace(block.key, "")
+                self.leaps.append(block)
+                prev_key = block.key
+                # Escape if there are no characters left to pick
+                if self.available_chars == "":
+                    break
         self.fitness = -1
 
     # Translates to a "button press encoding"
@@ -135,7 +147,7 @@ class Gene:
 
 class Leap:
     # Perform one leap to another letter
-    def __init__(self, available_chars, prev_key):
+    def __init__(self, available_chars, prev_key, freeze_keys=False, freeze_timing=False):
         # The key that you where holding on to
         self.prev_key = prev_key
         # The new key that you're grabbing towards
@@ -146,6 +158,9 @@ class Leap:
         # The time that you're releasing your muscles
         self.unflex_time = randint(config.unflexing_time_lowerbound
                                    , config.unflexing_time_upperbound)
+        self.freeze_keys = freeze_keys
+        self.freeze_timing = freeze_timing
+
 
     # Define the length of the gene as the amount of time skips
     def __len__(self):
@@ -166,12 +181,14 @@ class Leap:
         return self.compact_encoding()
 
     def mutate(self):
-        # Mutates the time intervals of one leap
-        self.flex_time = mutate_time(self.flex_time)
-        self.unflex_time = mutate_time(self.unflex_time)
-        # Mutate the letter that it's going to leap to
-        if random.uniform(0, 1) < config.mutation_rate_key:
-            self.key = choice(config.alphabet.replace(self.prev_key, ''))
+        if not self.freeze_timing:
+            # Mutates the time intervals of one leap
+            self.flex_time = mutate_time(self.flex_time)
+            self.unflex_time = mutate_time(self.unflex_time)
+        if not self.freeze_keys:
+            # Mutate the letter that it's going to leap to
+            if random.uniform(0, 1) < config.mutation_rate_key:
+                self.key = choice(config.alphabet.replace(self.prev_key, ''))
         return self
 
 
