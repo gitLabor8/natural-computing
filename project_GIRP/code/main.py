@@ -78,8 +78,8 @@ def SGA():
 if __name__ == '__main__':
     driver = Driver()
     SGA()
-    visualize_fitness(id=config.id_number)
-    visualize_height(id=config.id_number)
+    # visualize_fitness(id=51042402122418470103137833325575218912)
+    # visualize_height(id=51042402122418470103137833325575218912)
 
     #51042402122418470103137833325575218912 = using limited alphabet, 8 leaps
 

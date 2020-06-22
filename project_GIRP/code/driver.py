@@ -228,4 +228,4 @@ class Driver:
         if fitness.is_valid_run():
             return fitness.get_fitness()
         else:
-            return -1
+            return [],0
