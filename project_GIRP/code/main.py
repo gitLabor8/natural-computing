@@ -47,12 +47,12 @@ def SGA():
         print(str(population))
 
 if __name__ == '__main__':
-    # driver = Driver()
-    # SGA()
-    visualize_fitness(id=262903231952965922395671445180092458720)
+    driver = Driver()
+    SGA()
+    visualize_fitness(id=config.id_number)
 
     #51042402122418470103137833325575218912 = run met settings van github
 
-    #GIRP beaen in 3m22: https://www.youtube.com/watch?v=q1STTnctFms
+    #GIRP beaten in 3m22: https://www.youtube.com/watch?v=q1STTnctFms
     #Route: RTPSXQBDYTUOJQBLZIWOYELRZDUJVOFAWSTNZLFAGTHIRBEFDMGKCVUNLSXRPQ
     #Fixed keys, only time mutations and crossover: 290375702044397373575868582310983706336
