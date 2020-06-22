@@ -100,7 +100,7 @@ class Driver:
             print("Start new run with: " + code_sequence)
             self.alive = True
             fitness = self.controller(code_sequence)
-            time.sleep(2.5)
+            time.sleep(3)
             self.busy = False
             print("fitness=%f"%fitness[1])
             return fitness

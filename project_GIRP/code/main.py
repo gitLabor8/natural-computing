@@ -65,24 +65,20 @@ def visualize_height(id):
 
 def SGA():
     population = Population(freeze_keys=config.freeze_keys)
-    # population.evaluate(driver)
+    population.evaluate(driver)
     print("Evaluation:")
     print(str(population))
     for i in range(1, config.nr_or_generations + 1):
         population.become_successor()
         print("Evaluating population %i." % population.current_gen_number)
-        # population.evaluate(driver)
+        population.evaluate(driver)
         print("Evaluation:")
-        for i in population.genes:
-            print(i.button_press_encoding())
-            print("----------------------")
-            print("----------------------")
-        # print(str(population))
+        print(str(population))
 
 if __name__ == '__main__':
     # driver = Driver()
-    SGA()
-    # visualize_fitness(id=327371651909618846958347348048145491680)
+    # SGA()
+    visualize_fitness(id=260287108202705427697009674617458730720)
     # visualize_height(id=327371651909618846958347348048145491680)
 
     #51042402122418470103137833325575218912 = using limited alphabet, 8 leaps
