@@ -1,7 +1,7 @@
 
-#Playing GIRP
-##A Genetic Algorithm Approach
-###Dependencies
+# Playing GIRP
+## A Genetic Algorithm Approach
+### Dependencies
 To install the python (3) packages needed to run the project code, run:
 
 ```
@@ -9,10 +9,10 @@ pip install -r requirements.txt
 ```
 Furthermore, the driver requires a Firefox installation with a working Flash player. 
 
-###Configuration
+### Configuration
 To configure the genetic algorithm, hyperparameters in $\verb!config.py!$ can be configured.
 
-###Running the code
+### Running the code
 To start the project code, run
 
 ```
