@@ -10,7 +10,7 @@ pip install -r requirements.txt
 Furthermore, the driver requires a Firefox installation with a working Flash player.
 
 ### Configuration
-To configure the genetic algorithm, hyperparameters in $\verb!config.py!$ can be configured.
+To configure the genetic algorithm, hyperparameters in `'config.py'` can be configured.
 
 ### Running the code
 To start the project code, run
@@ -26,4 +26,4 @@ Note that any other input from peripherals or clicking on other windows will dis
 After the game is done, the Firefox window will close and a visualisation of the max fitness, average fitness and reached height will follow.
 
 ### Example run
-We recorded a screen recording of the program in action named $\ver!example_run.mov!$.
+We recorded a screen recording of the program in action named `'example_run.mov'`.
