@@ -31,11 +31,40 @@ def visualize_fitness(id):
     plt.legend()
     plt.show()
 
+
+def visualize_height(id):
+    with open(config.output_file) as file:
+        if os.path.getsize(config.output_file) > 0:
+            data = json.load(file)
+    genes = [candidate_solution for candidate_solution in data if candidate_solution['id']==id]
+    maxgen = genes[-1]['generation']
+    plotdata = list()
+    maxheight = 0
+
+
+
+    for gen in range(0, maxgen+1):
+        gendata = {}
+        maxgenheight = max([max(candidate_solution['intermediate_scores']) for candidate_solution in genes if candidate_solution['generation']==gen and candidate_solution['intermediate_scores']])
+        if maxgenheight > maxheight:
+            maxheight = maxgenheight
+        gendata['generation'] = gen
+        gendata['maxheight'] = maxheight
+        plotdata.append(gendata)
+
+    plt.plot(np.arange(maxgen+1), [y['maxheight'] for y in plotdata], color='red', label='Max reached height')
+    plt.xlabel("Generation")
+    plt.ylabel("Height in meters")
+    plt.title("Max reached height over time")
+    plt.legend()
+    plt.show()
+
+
 #
 
 
 def SGA():
-    population = Population(freeze_keys="rtpsxqbdytuojqblziwoyelrzdujvofawstnzlfagthirbefdmgkcvunlsxrpq")
+    population = Population(freeze_keys=config.freeze_keys)
     population.evaluate(driver)
     print("Evaluation:")
     print(str(population))
@@ -50,8 +79,9 @@ if __name__ == '__main__':
     driver = Driver()
     SGA()
     visualize_fitness(id=config.id_number)
+    visualize_height(id=config.id_number)
 
-    #51042402122418470103137833325575218912 = run met settings van github
+    #51042402122418470103137833325575218912 = using limited alphabet, 8 leaps
 
     #GIRP beaten in 3m22: https://www.youtube.com/watch?v=q1STTnctFms
     #Route: RTPSXQBDYTUOJQBLZIWOYELRZDUJVOFAWSTNZLFAGTHIRBEFDMGKCVUNLSXRPQ

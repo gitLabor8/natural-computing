@@ -22,7 +22,7 @@ mating_pool_size = population_size
 nr_or_generations = 10
 
 # The size that we want our solutions to be
-amount_of_leaps = 10
+amount_of_leaps = 8
 
 # Chance that two genes do a crossover
 crossover_rate = 0.3
@@ -54,8 +54,10 @@ else:
     starting_characters = "lr"
 
 # What are the letters that a rock can have?
-alphabet = "kdfthnuwszxq"
-# alphabet = "mkrshdftnjwzupeq"
+alphabet = "kdfthnjzupws"
+# Or if we only want to learn the timing with a fixed sequence of letters, we specify: (this sequence is a winning sequence)
+freeze_keys = None #"rtpsxqbdytuojqblziwoyelrzdujvofawstnzlfagthirbefdmgkcvunlsxrpq"
+
 
 
 # ###
@@ -63,9 +65,9 @@ alphabet = "kdfthnuwszxq"
 # ###
 
 # How long is the maximum time to flex/unflex in Time Intervals
-flexing_time_lowerbound = 2
+flexing_time_lowerbound = 1
 flexing_time_upperbound = 8
-unflexing_time_lowerbound = 2
+unflexing_time_lowerbound = 1
 unflexing_time_upperbound = 8
 
 # Keeps track of all the failed crossover attempts. Can be used for debugging
