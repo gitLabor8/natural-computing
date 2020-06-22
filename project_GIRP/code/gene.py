@@ -138,16 +138,14 @@ class Gene:
     def mutate(self):
         old = self.button_press_encoding()
         self.starting_time = mutate_time(self.starting_time)
-        self.leaps = [leap.mutate() for leap in self.leaps]
+        prev_key = self.starting_char
+        for i in range(0, len(self.leaps)):
+            self.leaps[i].mutate(prev_key)
+            prev_key = self.leaps[i].key
         # When the gene changed the score should be reset
         if old != self.button_press_encoding():
             self.fitness = -1
-            prev_key = self.starting_char
-            for i in range(0, len(self.leaps)):
-                self.leaps[i].prev_key = prev_key
-                prev_key = self.leaps[i].key
-        else:
-            return self
+        return self
 
 
 class Leap:
@@ -185,7 +183,8 @@ class Leap:
     def __str__(self):
         return self.compact_encoding()
 
-    def mutate(self):
+    def mutate(self, prev_key):
+        self.prev_key = prev_key
         if not self.freeze_timing:
             # Mutates the time intervals of one leap
             self.flex_time = mutate_time(self.flex_time)
