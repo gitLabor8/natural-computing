@@ -1,0 +1,10 @@
+# experimental 'main.py' that can be used to test files manually
+lab.py
+selenium/*
+geckodriver.log
+
+#Ignore pycache
+*.pyc
+
+# ignore the generated data, unless it's renamed
+storage/data.json
