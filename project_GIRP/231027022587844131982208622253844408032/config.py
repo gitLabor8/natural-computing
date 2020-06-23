@@ -25,7 +25,7 @@ nr_or_generations = 10
 amount_of_leaps = 10
 
 # Chance that two genes do a crossover
-crossover_rate = 0.6
+crossover_rate = 0.3
 
 # Chance that one number in a gene mutates
 #  So a gene with 10 leaps has 1-(1-0.20)^(1+10*2)=99% chance to mutate time
@@ -37,7 +37,7 @@ mutation_rate_key = 0.01
 # How to determine a mating pool
 # 0 = roulette based on relative fitness
 # 1 = roulette based on ranked fitness
-fitness_selection = 1
+fitness_selection = 0
 
 # ###
 # Game specific tweaks

@@ -8,6 +8,7 @@ from population import Population
 import matplotlib.pyplot as plt
 import numpy as np
 import config, os, json
+import random #remove
 
 def visualize_fitness(id):
     with open(config.output_file) as file:
@@ -41,15 +42,13 @@ def visualize_height(id):
     plotdata = list()
     maxheight = 0
 
-
-
     for gen in range(0, maxgen+1):
         gendata = {}
         maxgenheight = max([max(candidate_solution['intermediate_scores']) for candidate_solution in genes if candidate_solution['generation']==gen and candidate_solution['intermediate_scores']])
         if maxgenheight > maxheight:
             maxheight = maxgenheight
         gendata['generation'] = gen
-        gendata['maxheight'] = maxheight
+        gendata['maxheight'] = maxgenheight
         plotdata.append(gendata)
 
     plt.plot(np.arange(maxgen+1), [y['maxheight'] for y in plotdata], color='red', label='Max reached height')
@@ -78,8 +77,9 @@ def SGA():
 if __name__ == '__main__':
     # driver = Driver()
     # SGA()
-    visualize_fitness(id=260287108202705427697009674617458730720)
-    # visualize_height(id=327371651909618846958347348048145491680)
+    visualize_fitness(id=290375702044397373575868582310983706336)
+    visualize_height(id=290375702044397373575868582310983706336)
+
 
     #51042402122418470103137833325575218912 = using limited alphabet, 8 leaps
 
